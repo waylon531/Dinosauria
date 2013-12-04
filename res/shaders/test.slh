@@ -1,0 +1,1 @@
+#define TEST_VALUE sin(0.5*t)

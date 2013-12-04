@@ -1,0 +1,8 @@
+<!DOCTYPE xml>
+
+<dinosaur name="Parasaur"
+	  speed=".1">
+  <description>The Parasaur is a dinosaur.</description>
+  <mesh>res/models/parasour/PARASAUR.OBJ</mesh>
+  <material>res/materials/blockasaurus.mat</material>
+</dinosaur>
