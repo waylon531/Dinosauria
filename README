@@ -1,0 +1,15 @@
+=== Dinosauria 0.1.0 ===
+
+For more information about the game itself, look at http://code.google.com/p/dinosauria/
+
+=== Compiling ===
+In the "dinosauira" root direcotry, type:
+  scons
+
+=== License ===
+See the file "LICENSE"
+  
+=== Authors ===
+
+- Benjamin Lee, (benjamin.fik.lee@gmail.com)
+- Nikolas Kubler, (nikolas@kublers.com)
