@@ -1,7 +1,7 @@
 import os
 import fnmatch
 from colorizer import colorizer
-
+import doxygen
 env = Environment(CXX = "g++",
                   CXXFLAGS = '-std=c++0x -Isrc -Iexternal/include -I/usr/include',
                   LINKFLAGS = '-std=c++0x -L/usr/lib -Lexternal/lib',
@@ -12,6 +12,8 @@ env = Environment(CXX = "g++",
 env.Decider('MD5')
 col = colorizer()
 col.colorize(env)
+doxygen.generate(env)
+env.Doxygen("doc/Doxyfile")
 
 #run configure
 conf = Configure(env)

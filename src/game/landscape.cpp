@@ -101,11 +101,11 @@ Landscape::~Landscape()
   material_shadow.reset();
   delete[] verts;
   delete[] inds;
-  delete[] hmap;
   delete[] nmap;
   delete[] bmap;
   if(hasLoaded)
     {
+      delete[] hmap;
       tex_height.reset();
       tex_normal.reset();
       b_verts.reset();

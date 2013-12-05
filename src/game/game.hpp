@@ -38,10 +38,12 @@ private:
   std::shared_ptr<graphics::GLSL> shader_Cbloom_hblur;
   std::shared_ptr<graphics::GLSL> shader_Cbloom_vblur;
   std::shared_ptr<graphics::GLSL> shader_Cbloom_final;
-  std::shared_ptr<graphics::GLPass> pass_Cbloom_color0;
-  std::shared_ptr<graphics::GLPass> pass_Cbloom_color1;
-  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom0;
-  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom1;
+  std::shared_ptr<graphics::GLPass> pass_Cbloom_color_sub;
+  std::shared_ptr<graphics::GLPass> pass_Cbloom_color_hblur;
+  std::shared_ptr<graphics::GLPass> pass_Cbloom_color_vblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_sub;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_hblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_vblur;
   std::shared_ptr<graphics::Compositor> comp_basic;
   
   /** Get the ideal camera position

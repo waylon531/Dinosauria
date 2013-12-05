@@ -38,18 +38,20 @@ Game::Game()
   shader_Cfog->attachUniform(pass_Cwater_color->unif);
   comp_fog = MKPTR(graphics::Compositor,shader_Cfog);
 
-  fbo_Cbloom0 = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  fbo_Cbloom1 = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  pass_Cbloom_color0 = MKPTR(graphics::GLPass, fbo_Cbloom0, 0, "tex_bloom");
-  pass_Cbloom_color1 = MKPTR(graphics::GLPass, fbo_Cbloom1, 0, "tex_bloom");
+  fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_bloom");
+  pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_bloom");
+  pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom");
   shader_Cbloom_sub = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/sub.frag");
   shader_Cbloom_sub->attachUniform(pass_Cwater_color->unif);
   shader_Cbloom_hblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/hblur.frag");
-  shader_Cbloom_hblur->attachUniform(pass_Cbloom_color0->unif);
+  shader_Cbloom_hblur->attachUniform(pass_Cbloom_color_sub->unif);
   shader_Cbloom_vblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/vblur.frag");
-  shader_Cbloom_vblur->attachUniform(pass_Cbloom_color1->unif);
+  shader_Cbloom_vblur->attachUniform(pass_Cbloom_color_hblur->unif);
   shader_Cbloom_final = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/final.frag");
-  shader_Cbloom_final->attachUniform(pass_Cbloom_color0->unif);
+  shader_Cbloom_final->attachUniform(pass_Cbloom_color_vblur->unif);
   shader_Cbloom_final->attachUniform(pass_Cwater_color->unif);
   comp_bloom = MKPTR(graphics::Compositor,std::shared_ptr<graphics::GLSL>(NULL));
   
@@ -166,42 +168,42 @@ void Game::render()
   ocean->pass_normal->useTex();
   ocean->fbo->useTex();
   fbo->useTex();
-  //fbo_Cwater->use();
+  fbo_Cwater->use();
   pass_Cwater_color->use();
   pass_Cwater_depth->use();
   comp_water->draw();
-  //fbo_Cwater->unuse();  
+  fbo_Cwater->unuse();  
   fbo_Cwater->useTex();
   pass_Cwater_color->useTex();
   pass_Cwater_depth->useTex();
 
   //bloom
-  /*comp_bloom->shader = shader_Cbloom_sub;
-  pass_Cbloom_color0->use();
-  fbo_Cbloom0->use();
+  comp_bloom->shader = shader_Cbloom_sub;
+  pass_Cbloom_color_sub->use();
+  fbo_Cbloom_sub->use();
   comp_bloom->draw();
-  fbo_Cbloom0->unuse();
-  pass_Cbloom_color0->useTex();
-  fbo_Cbloom0->useTex();
+  fbo_Cbloom_sub->unuse();
+  pass_Cbloom_color_sub->useTex();
+  fbo_Cbloom_sub->useTex();
   
-  //fbo_Cbloom1->use();
+  //fbo_Cbloom_hblur->use();
   comp_bloom->shader = shader_Cbloom_hblur;
-  pass_Cbloom_color1->use();
+  pass_Cbloom_color_hblur->use();
   comp_bloom->draw();
-  //fbo_Cbloom1->unuse();
-  pass_Cbloom_color1->useTex();
-  fbo_Cbloom1->useTex();
-  /*
-  fbo_Cbloom0->use();
-  comp_bloom->shader = shader_Cbloom_vblur;
-  pass_Cbloom_color0->use();
-  comp_bloom->draw();
-  fbo_Cbloom0->unuse();
-  pass_Cbloom_color0->useTex();
-  fbo_Cbloom0->useTex();
+  //fbo_Cbloom_hblur->unuse();
+  pass_Cbloom_color_hblur->useTex();
+  fbo_Cbloom_hblur->useTex();
   
-  comp_bloom->shader = shader_Cbloom_final;
-  comp_bloom->draw();*/
+  /*fbo_Cbloom_vblur->use();
+  comp_bloom->shader = shader_Cbloom_vblur;
+  pass_Cbloom_color_vblur->use();
+  comp_bloom->draw();
+  fbo_Cbloom_vblur->unuse();
+  pass_Cbloom_color_vblur->useTex();
+  fbo_Cbloom_vblur->useTex();*/
+  
+  //comp_bloom->shader = shader_Cbloom_final;
+  //comp_bloom->draw();
   //comp_final->draw();
 }
 

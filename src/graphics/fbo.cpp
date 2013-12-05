@@ -69,8 +69,11 @@ void graphics::GLFrameBuffer::use()
 }
 void graphics::GLFrameBuffer::useTex()
 {
-  glActiveTexture(GL_TEXTURE0+id_tex_depth);
-  glBindTexture(GL_TEXTURE_2D,id_tex_depth);
+  if(hasDepth)
+    {
+      glActiveTexture(GL_TEXTURE0+id_tex_depth);
+      glBindTexture(GL_TEXTURE_2D,id_tex_depth);
+    }
 }
 
 void graphics::GLFrameBuffer::unuse()

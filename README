@@ -5,7 +5,8 @@ For more information about the game itself, look at http://code.google.com/p/din
 === Compiling ===
 In the "dinosauira" root direcotry, type:
   scons
-
+Note that if you want documentation to be generated, you must have doxygen installed. In addition, if you want inheritance graphs, you must have graphviz dot installed.
+  
 === License ===
 See the file "LICENSE"
   
