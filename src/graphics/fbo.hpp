@@ -18,7 +18,7 @@ namespace graphics
 
     /** The last used fbo */
     GLint oldFBO;
-    
+
   public:
 
     /** The framebuffer width */

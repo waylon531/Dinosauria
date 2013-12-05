@@ -57,6 +57,7 @@ GLSL::~GLSL()
 
 void GLSL::addShader(const std::string fname, const GLuint type)
 {
+  debugName = fname;
   GLuint id = glCreateShader(type);
 #ifdef DEBUG
   std::cout << "Created shader of type " << type << " with id " << id << std::endl;
@@ -174,6 +175,10 @@ void GLSL::use()
 
 void GLSL::attachUniform(std::shared_ptr<GLSLUniform> uniform)
 {
-  GLuint loc = glGetUniformLocation(prog_id, uniform->getName().c_str());
-  uniforms.push_back(GLSLUniformAndLoc{uniform,loc});
+  GLint loc = glGetUniformLocation(prog_id, uniform->getName().c_str());
+  if(loc==-1) std::cout << "GLSL Error: could not find uniform \"" << uniform->getName() << "\" in shader " << debugName << std::endl;
+  #ifdef DEBUG
+  std::cout << "Adding uniform \"" << uniform->getName() << "\" to shader " << debugName << " with location " << loc << std::endl;
+  #endif
+  uniforms.push_back(GLSLUniformAndLoc{uniform,(GLuint)loc});
 }

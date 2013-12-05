@@ -46,13 +46,15 @@ void graphics::GLFrameBuffer::update()
 }
 graphics::GLFrameBuffer::~GLFrameBuffer()
 {
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+  glDeleteFramebuffers(1, &id_fbo);
   if(hasDepth)
     {
       //glDeleteRenderbuffers(1, &id_depth);
+      glBindTexture(GL_TEXTURE_2D,0);
       glDeleteTextures(1, &id_tex_depth);
     }
   unif_depth.reset();
-  glDeleteFramebuffers(1, &id_fbo);
 }
 
 void graphics::GLFrameBuffer::use()
@@ -147,8 +149,8 @@ graphics::GLDepthPass::~GLDepthPass()
 
 void graphics::GLDepthPass::use()
 {
-  //glActiveTexture(GL_TEXTURE0+id_tex);
-  //glBindTexture(GL_TEXTURE_2D,0);
+  glActiveTexture(GL_TEXTURE0+id_tex);
+  glBindTexture(GL_TEXTURE_2D,0);
 }
 
 void graphics::GLDepthPass::useTex()

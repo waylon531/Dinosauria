@@ -31,6 +31,9 @@ namespace graphics
 		
     /** @brief OpenGL id number of shader program */
     GLuint prog_id;
+
+    /** The name used to debug if something goes wrong */
+    std::string debugName;
 		
     /** @brief List of uniforms attached to this shader */
     std::vector<GLSLUniformAndLoc> uniforms;

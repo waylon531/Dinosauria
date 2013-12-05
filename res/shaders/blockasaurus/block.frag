@@ -42,7 +42,7 @@ float occluded(vec3 normal)
 
 #define AMBIENT .2
 #define DIFFUSE .7
-#define SPECULAR .5
+#define SPECULAR 2.
 vec3 computeLighting(vec3 base, vec3 normal)
 {
   float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);

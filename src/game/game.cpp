@@ -9,7 +9,7 @@ Game::Game()
   camera = std::shared_ptr<graphics::Camera>(new graphics::Camera(CAMERA_START,
 								  glm::vec3(0.f,0.f,0.f)));
   world = std::shared_ptr<graphics::World>(new graphics::World(camera));
-  sky = std::shared_ptr<graphics::Sky>(new graphics::Sky(glm::vec3(.5f,.5f,1.f)));
+  sky = std::shared_ptr<graphics::Sky>(new graphics::Sky(glm::vec3(.2f,.2f,.5f)));
   ground = std::shared_ptr<Landscape>(new Landscape);
   world->addMesh(ground);
   ocean = std::shared_ptr<Ocean>(new Ocean);
@@ -41,9 +41,12 @@ Game::Game()
   fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_bloom");
-  pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_bloom");
+  pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color");
+  pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_color");
   pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom");
+  fbo_Cbloom_sub->update();
+  fbo_Cbloom_hblur->update();
+  fbo_Cbloom_vblur->update();
   shader_Cbloom_sub = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/sub.frag");
   shader_Cbloom_sub->attachUniform(pass_Cwater_color->unif);
   shader_Cbloom_hblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/bloom/hblur.frag");
@@ -179,31 +182,31 @@ void Game::render()
 
   //bloom
   comp_bloom->shader = shader_Cbloom_sub;
-  pass_Cbloom_color_sub->use();
   fbo_Cbloom_sub->use();
+  pass_Cbloom_color_sub->use();
   comp_bloom->draw();
   fbo_Cbloom_sub->unuse();
   pass_Cbloom_color_sub->useTex();
   fbo_Cbloom_sub->useTex();
   
-  //fbo_Cbloom_hblur->use();
+  fbo_Cbloom_hblur->use();
   comp_bloom->shader = shader_Cbloom_hblur;
   pass_Cbloom_color_hblur->use();
   comp_bloom->draw();
-  //fbo_Cbloom_hblur->unuse();
+  fbo_Cbloom_hblur->unuse();
   pass_Cbloom_color_hblur->useTex();
   fbo_Cbloom_hblur->useTex();
   
-  /*fbo_Cbloom_vblur->use();
+  fbo_Cbloom_vblur->use();
   comp_bloom->shader = shader_Cbloom_vblur;
   pass_Cbloom_color_vblur->use();
   comp_bloom->draw();
   fbo_Cbloom_vblur->unuse();
   pass_Cbloom_color_vblur->useTex();
-  fbo_Cbloom_vblur->useTex();*/
+  fbo_Cbloom_vblur->useTex();
   
-  //comp_bloom->shader = shader_Cbloom_final;
-  //comp_bloom->draw();
+  comp_bloom->shader = shader_Cbloom_final;
+  comp_bloom->draw();
   //comp_final->draw();
 }
 
