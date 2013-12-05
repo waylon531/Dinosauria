@@ -84,7 +84,7 @@ void graphics::GLFrameBuffer::unuse()
   current_viewport->use();
 }
 
-graphics::GLPass::GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, const std::string& unif_name, const GLenum type)
+graphics::GLPass::GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, const std::string& unif_name, const GLenum type, const GLenum type2)
 {
   glBindFramebuffer(GL_FRAMEBUFFER,fbo->id_fbo);
   glGenTextures(1, &id_tex);
@@ -94,7 +94,7 @@ graphics::GLPass::GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, cons
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, type, fbo->fw, fbo->fh, 0, GL_RGBA, GL_FLOAT, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, type, fbo->fw, fbo->fh, 0, GL_RGBA, type2, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+passNum, GL_TEXTURE_2D, id_tex, 0);
   fbo->id_passes[fbo->numPasses] = GL_COLOR_ATTACHMENT0+passNum;
   fbo->numPasses++;

@@ -54,7 +54,7 @@ float occluded(vec3 normal)
 vec3 computeLighting(vec3 base, vec3 normal)
 {
   float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);
-  specular = pow(specular,20.0);
+  specular = pow(specular,2.0);
   float diffuse = clamp(dot(normal,sunDir),0.0,1.0);
   float ambient = 1.0;
   return base*((SPECULAR*specular + DIFFUSE*diffuse)*occluded(normal) + AMBIENT*ambient);

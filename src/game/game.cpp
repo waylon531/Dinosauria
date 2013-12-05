@@ -15,9 +15,9 @@ Game::Game()
   ocean = std::shared_ptr<Ocean>(new Ocean);
   
   fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
-  pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color");
+  pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   fbo_Cwater = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  pass_Cwater_color = MKPTR(graphics::GLPass, fbo_Cwater, 0, "tex_color");
+  pass_Cwater_color = MKPTR(graphics::GLPass, fbo_Cwater, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_Cwater_depth = MKPTR(graphics::GLPass, fbo_Cwater, 1, "tex_depth");
   fbo->update();
   fbo_Cwater->update();
@@ -41,9 +41,9 @@ Game::Game()
   fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color");
-  pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_color");
-  pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom");
+  pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
+  pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
+  pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom",GL_RGBA32F,GL_HALF_FLOAT);
   fbo_Cbloom_sub->update();
   fbo_Cbloom_hblur->update();
   fbo_Cbloom_vblur->update();

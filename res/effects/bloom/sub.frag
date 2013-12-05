@@ -11,7 +11,7 @@ void main()
 {
   vec4 color = texture2D(tex_color,vTexCoord.st);
   //fColor = clamp(color-vec4(vec3(VALUE),0.0),vec4(0.0),vec4(1.0))+vec4(vec3(VALUE),0.0);
-  if(max(max(color.r,color.g),color.b) < 0.9)
+  if(max(max(color.r,color.g),color.b) < 1.0)
     {
       fColor = vec4(0.0,0.0,0.0,1.0);
     }
@@ -19,4 +19,5 @@ void main()
     {
       fColor = color;
     }
+  //fColor = color/1.0f;
 }

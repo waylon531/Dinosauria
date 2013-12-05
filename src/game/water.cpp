@@ -23,7 +23,7 @@ Ocean::Ocean()
   m_model = glm::mat4();
 
   fbo = std::shared_ptr<graphics::GLFrameBuffer>(new graphics::GLFrameBuffer(W,H, true, "tex_water_depth"));
-  pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_water_color");
+  pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_water_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_normal = MKPTR(graphics::GLPass, fbo, 1, "tex_water_normal");
   fbo->update();
 

@@ -85,7 +85,7 @@ namespace graphics
 
     /** Initialize from a framebuffer
      * @param passNum the pass number */
-    GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, const std::string& unif_name, const GLenum type=GL_RGBA);
+    GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, const std::string& unif_name, const GLenum type=GL_RGBA, const GLenum type2=GL_FLOAT);
 
     /** Destroy */
     ~GLPass();
