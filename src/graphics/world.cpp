@@ -58,7 +58,8 @@ void graphics::World::render()
       glClear(GL_DEPTH_BUFFER_BIT);
       //m_lightView = camera->mat_view;
       #define TMP 10
-      glm::mat4 m_lightProject = glm::ortho<float>(-TMP*scale,TMP*scale,-TMP*scale,TMP*scale,-TMP*2.0*scale,TMP*2.0*scale);//glm::mat4(1.0);//glm::ortho<float>(0.0, SHADOW_W, 1.0, SHADOW_H);
+      #define Z_TMP 20
+      glm::mat4 m_lightProject = glm::ortho<float>(-TMP*scale,TMP*scale,-TMP*scale,TMP*scale,-Z_TMP,Z_TMP);//glm::mat4(1.0);//glm::ortho<float>(0.0, SHADOW_W, 1.0, SHADOW_H);
       m_light[0] = m_lightProject * m_lightView;
       for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
 	{
