@@ -29,6 +29,7 @@ Game::Game()
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyeDir",&camera->look));
+  shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyePos",&camera->pos));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_view",&camera->mat_view));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_project",&camera->mat_project));
   comp_water = MKPTR(graphics::Compositor,shader_Cwater);

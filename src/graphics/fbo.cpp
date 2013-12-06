@@ -46,14 +46,13 @@ void graphics::GLFrameBuffer::update()
 }
 graphics::GLFrameBuffer::~GLFrameBuffer()
 {
-  glBindFramebuffer(GL_FRAMEBUFFER,0);
-  glDeleteFramebuffers(1, &id_fbo);
+  use();
   if(hasDepth)
     {
       //glDeleteRenderbuffers(1, &id_depth);
-      glBindTexture(GL_TEXTURE_2D,0);
       glDeleteTextures(1, &id_tex_depth);
     }
+  glDeleteFramebuffers(1, &id_fbo);
   unif_depth.reset();
 }
 
