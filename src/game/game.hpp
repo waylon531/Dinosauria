@@ -41,14 +41,30 @@ private:
   std::shared_ptr<graphics::GLPass> pass_Cbloom_color_sub;
   std::shared_ptr<graphics::GLPass> pass_Cbloom_color_hblur;
   std::shared_ptr<graphics::GLPass> pass_Cbloom_color_vblur;
+  std::shared_ptr<graphics::GLPass> pass_Cbloom_color_final;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_sub;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_hblur;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_vblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_final;
+
+  std::shared_ptr<graphics::GLSL> shader_Cdof_down;
+  std::shared_ptr<graphics::GLSL> shader_Cdof_hblur;
+  std::shared_ptr<graphics::GLSL> shader_Cdof_vblur;
+  std::shared_ptr<graphics::GLSL> shader_Cdof_final;
+  std::shared_ptr<graphics::GLPass> pass_Cdof_color_down;
+  std::shared_ptr<graphics::GLPass> pass_Cdof_color_hblur;
+  std::shared_ptr<graphics::GLPass> pass_Cdof_color_vblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_down;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_hblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_vblur;
+  
   std::shared_ptr<graphics::Compositor> comp_basic;
   
   /** Get the ideal camera position
    * @return ideal location of a camera */
   glm::vec3 getCameraLoc();
+  /** The camera-s focal length */
+  float focalLength;
 
   int time;
 

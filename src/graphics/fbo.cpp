@@ -46,14 +46,13 @@ void graphics::GLFrameBuffer::update()
 }
 graphics::GLFrameBuffer::~GLFrameBuffer()
 {
-  glBindFramebuffer(GL_FRAMEBUFFER,0);
-  glDeleteFramebuffers(1, &id_fbo);
+  use();
   if(hasDepth)
     {
       //glDeleteRenderbuffers(1, &id_depth);
-      glBindTexture(GL_TEXTURE_2D,0);
       glDeleteTextures(1, &id_tex_depth);
     }
+  glDeleteFramebuffers(1, &id_fbo);
   unif_depth.reset();
 }
 
@@ -90,8 +89,8 @@ graphics::GLPass::GLPass(std::shared_ptr<GLFrameBuffer> fbo, GLint passNum, cons
   glGenTextures(1, &id_tex);
   glActiveTexture(GL_TEXTURE0+id_tex);
   glBindTexture(GL_TEXTURE_2D, id_tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, type, fbo->fw, fbo->fh, 0, GL_RGBA, type2, 0);

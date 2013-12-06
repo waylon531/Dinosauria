@@ -29,6 +29,7 @@ Game::Game()
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyeDir",&camera->look));
+  shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyePos",&camera->pos));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_view",&camera->mat_view));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_project",&camera->mat_project));
   comp_water = MKPTR(graphics::Compositor,shader_Cwater);
@@ -38,7 +39,9 @@ Game::Game()
   shader_Cfog->attachUniform(pass_Cwater_color->unif);
   comp_fog = MKPTR(graphics::Compositor,shader_Cfog);
 
-  fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, W,H, false);
+#define BLOOM_W (W)
+#define BLOOM_H (H)
+  fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
   fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
@@ -57,6 +60,30 @@ Game::Game()
   shader_Cbloom_final->attachUniform(pass_Cbloom_color_vblur->unif);
   shader_Cbloom_final->attachUniform(pass_Cwater_color->unif);
   comp_bloom = MKPTR(graphics::Compositor,std::shared_ptr<graphics::GLSL>(NULL));
+
+  fbo_Cbloom_final = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  pass_Cbloom_color_final = MKPTR(graphics::GLPass, fbo_Cbloom_final, 0, "tex_color");
+  fbo_Cbloom_final->update();
+  fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/4, H/4, false);
+  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color");
+  pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color");
+  pass_Cdof_color_vblur = MKPTR(graphics::GLPass, fbo_Cdof_vblur, 0, "tex_dof");
+  fbo_Cdof_down->update();
+  fbo_Cdof_hblur->update();
+  fbo_Cdof_vblur->update();
+  shader_Cdof_down = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/down.frag");
+  shader_Cdof_down->attachUniform(pass_Cbloom_color_final->unif);
+  shader_Cdof_hblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/hblur.frag");
+  shader_Cdof_hblur->attachUniform(pass_Cdof_color_down->unif);
+  shader_Cdof_vblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/vblur.frag");
+  shader_Cdof_vblur->attachUniform(pass_Cdof_color_hblur->unif);
+  shader_Cdof_final = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/dof.frag");
+  shader_Cdof_final->attachUniform(pass_Cdof_color_vblur->unif);
+  shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
+  shader_Cdof_final->attachUniform(fbo->unif_depth);
+  shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
   
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
   shader_Cbasic->attachUniform(pass_color->unif);
@@ -146,9 +173,11 @@ void Game::setPlayer(std::shared_ptr<Dinosaur> dino)
 void Game::render()
 {
 #define ALPHA 0.025f
-  camera->setPos(camera->pos*(1.0f-ALPHA) + getCameraLoc()*ALPHA);
+  glm::vec3 camLoc = getCameraLoc();
+  camera->setPos(camera->pos*(1.0f-ALPHA) + camLoc*ALPHA);
   float cmax = ground->eval(camera->pos.x, camera->pos.z) + 2.0;
   if(camera->pos.y <= cmax) camera->setPos(glm::vec3(camera->pos.x, cmax, camera->pos.z));
+  focalLength = glm::length(camera->pos - player->pos);
 #undef ALPHA
   time++;
   float angle = (float)time/1000.0f;
@@ -206,8 +235,32 @@ void Game::render()
   fbo_Cbloom_vblur->useTex();
   
   comp_bloom->shader = shader_Cbloom_final;
+  fbo_Cbloom_final->use();
   comp_bloom->draw();
-  //comp_final->draw();
+  fbo_Cbloom_final->unuse();
+  pass_Cbloom_color_final->useTex();
+
+  comp_bloom->shader = shader_Cdof_down;
+  fbo_Cdof_down->use();
+  comp_bloom->draw();
+  fbo_Cdof_down->unuse();
+  pass_Cdof_color_down->useTex();
+
+  comp_bloom->shader = shader_Cdof_hblur;
+  fbo_Cdof_hblur->use();
+  comp_bloom->draw();
+  fbo_Cdof_hblur->unuse();
+  pass_Cdof_color_hblur->useTex();
+
+  comp_bloom->shader = shader_Cdof_vblur;
+  fbo_Cdof_vblur->use();
+  comp_bloom->draw();
+  fbo_Cdof_vblur->unuse();
+  pass_Cdof_color_vblur->useTex();
+
+  comp_bloom->shader = shader_Cdof_final;
+  comp_bloom->draw();
+    
 }
 
 void Game::resetGame()
