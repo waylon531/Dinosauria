@@ -4,5 +4,5 @@ ctrl res/shaders/ground.ctrl
 geom res/shaders/ground.geom
 frag res/shaders/ground.frag
 link
-tex res/textures/dirt2.png tex_dirt
+tex res/textures/dirt.png tex_dirt
 tex res/textures/rock.png tex_rock

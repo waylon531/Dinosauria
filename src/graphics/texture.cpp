@@ -34,8 +34,9 @@ graphics::GLTexture2D::GLTexture2D(const std::string& fname, const std::string& 
   //std::cout << id << "," << unifName << std::endl;
   use();
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, h,w, 0, GL_RGBA, GL_FLOAT, data);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glGenerateMipmap(GL_TEXTURE_2D);
   unif = std::shared_ptr<GLSLUniform>(new GLSLUniform(unifName.c_str(), (GLint*)&id));
 }
 

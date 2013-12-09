@@ -14,13 +14,13 @@ float toDepth(float x)
   return -1./(x-1.00001);
 }
 
-#define DOF_FACTOR 0.9
+#define DOF_FACTOR 1.0
 
 float getBlur(float d)
 {
   float xd = abs(d - focalLength);
   float xxd = (d < focalLength) ? (focalLength - xd) : (focalLength + xd);
-  return DOF_FACTOR * (xd/xxd);
+  return DOF_FACTOR * pow(xd/xxd,2.0);
 }
 
 void main()

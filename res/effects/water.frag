@@ -45,7 +45,7 @@ void main()
 	  float depth = toDepth(z);
 	  fDepth = vec4(z);
 	  vec4 color_water = texture2D(tex_water_color,vTexCoord.st).rgba;
-	  fColor = mix(mix(color_land,vec4(0.0,0.0,1.0,1.0), clamp(0.001*(depth-water_depth),0.0,1.0)), color_water, 0.25);
+	  fColor = mix(mix(color_land,vec4(0.0,0.0,.5,1.0), clamp(0.001*(depth-water_depth),0.0,1.0)), color_water, 0.25);
 	}
       else
 	{
@@ -71,11 +71,11 @@ void main()
 	  float depth = toDepth(z);
 	  fDepth = vec4(z);
 	  vec4 color_water = texture2D(tex_water_color,vTexCoord.st).rgba;
-	  fColor = mix(mix(color_land,vec4(0.0,0.0,1.0,1.0), clamp(0.01*(water_depth),0.0,1.0)), color_water, 0.25);
+	  fColor = mix(mix(color_land,vec4(0.0,0.0,0.5,1.0), clamp(0.01*(water_depth),0.0,1.0)), color_water, 0.25);
 	}
       else
 	{
-	  fColor = mix(color_land,vec4(0.0,0.0,1.0,1.0), clamp(0.01*(depth),0.0,1.0));
+	  fColor = mix(color_land,vec4(0.0,0.0,0.5,1.0), clamp(0.01*(depth),0.0,1.0));
 	  fDepth = vec4(z);
 	}
     }      

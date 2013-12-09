@@ -64,7 +64,7 @@ Game::Game()
   fbo_Cbloom_final = MKPTR(graphics::GLFrameBuffer, W,H, false);
   pass_Cbloom_color_final = MKPTR(graphics::GLPass, fbo_Cbloom_final, 0, "tex_color");
   fbo_Cbloom_final->update();
-  fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/4, H/4, false);
+  fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/2, H/2, false);
   fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color");
@@ -74,7 +74,7 @@ Game::Game()
   fbo_Cdof_hblur->update();
   fbo_Cdof_vblur->update();
   shader_Cdof_down = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/down.frag");
-  shader_Cdof_down->attachUniform(pass_Cbloom_color_final->unif);
+  shader_Cdof_down->attachUniform(pass_Cwater_color->unif);
   shader_Cdof_hblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/hblur.frag");
   shader_Cdof_hblur->attachUniform(pass_Cdof_color_down->unif);
   shader_Cdof_vblur = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/vblur.frag");
