@@ -5,7 +5,7 @@ uniform sampler2D tex_color;
 in vec2 vTexCoord;
 layout (location=0) out vec4 fColor;
 
-#define RADIUS 0.025
+#define RADIUS 0.01
 #define N_SAMPLES 7
 
 const float SPACING=RADIUS/N_SAMPLES;

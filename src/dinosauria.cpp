@@ -435,7 +435,7 @@ void initAllDinos()
 int main(int argc, char** argv)
 {
   //run primary prototype
-  context = new graphics::GLContext(REAL_W,REAL_H,"prototype test");
+  context = new graphics::GLContext(REAL_W,REAL_H,"Dinosauria");
   graphics::initAtlas();
   gui::initFonts();
   initAllDinos();

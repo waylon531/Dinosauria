@@ -8,7 +8,7 @@ uniform int t;
 in vec2 vTexCoord;
 
 layout (location=0) out vec4 fColor;
-layout (location=1) out vec4 fNormalPass;
+layout (location=1) out vec4 fNormal;
 
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex 
@@ -138,5 +138,5 @@ void main()
   //vec3 normal = vec3(0.0,1.0,0.0);
   normal = mix(vec3(0.0,1.0,0.0),normal,0.25);
   fColor = vec4(computeLighting(vec3(0.5,0.5,.6), normal),1.0);
-  fNormalPass = vec4(normal,1.0);
+  fNormal = vec4(normal,1.f);
 }

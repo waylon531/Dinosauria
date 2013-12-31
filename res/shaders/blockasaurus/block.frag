@@ -11,8 +11,13 @@ uniform mat4 m_light[N_SHADOW_BUFFERS];
 layout (location=0) in vec3 vNormal;
 layout (location=1) in vec2 vTexCoord;
 layout (location=2) in vec4 vPosition;
+layout (location=3) in vec4 vPositionView;
 
-out vec4 fColor;
+layout (location=0) out vec4 fColor;
+layout (location=1) out vec4 fNormal;
+layout (location=2) out vec4 fPosition;
+layout (location=4) out vec4 fParams;
+
 
 float occluded(vec3 normal)
 {
@@ -55,5 +60,9 @@ vec3 computeLighting(vec3 base, vec3 normal)
 void main()
 {
   vec3 base = texture2D(tex_skin, vTexCoord.st/2.f).xyz;
-  fColor = vec4(computeLighting(base, normalize(vNormal)), 1.0f);
+  //fColor = vec4(computeLighting(base, normalize(vNormal)), 1.0f);
+  fColor = vec4(base,1.f);
+  fNormal = vec4(normalize(vNormal),1.f);
+  fParams = vec4(.7,2.,15.,1.);
+  fPosition = vPosition;
 }

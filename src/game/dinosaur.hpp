@@ -75,10 +75,6 @@ public:
 
   void setMatrixView(glm::mat4* view);
   void setMatrixProject(glm::mat4* project);
-  void setEyeDir(glm::vec3* dir);
-  void setSunDir(glm::vec3* dir);
-  void setShadowTex(GLint* tex) {parent->mesh->setShadowTex(tex);}
-  void setMatrixLight(glm::mat4* light) {parent->mesh->setMatrixLight(light);}
 
   void render();
 };

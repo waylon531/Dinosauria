@@ -63,10 +63,10 @@ void Ocean::render(std::shared_ptr<graphics::World> world)
   material->setMatrixProject(m_project);
   material->setMatrixView(m_view);
   material->setMatrixModel(&m_model);
-  material->setEyeDir(eye);
+  /*material->setEyeDir(eye);
   material->setSunDir(sun);
   material->setShadowTex(tex_shadow);
-  material->setMatrixLight(m_light);
+  material->setMatrixLight(m_light);*/
   material->use();
   b_verts->use();
   fbo->use();

@@ -29,14 +29,6 @@ namespace graphics
     std::shared_ptr<GLSLUniform> u_view;
     /** The projection matrix uniform */
     std::shared_ptr<GLSLUniform> u_project;
-    /** The eye uniform */
-    std::shared_ptr<GLSLUniform> u_eye;
-    /** The sun uniform */
-    std::shared_ptr<GLSLUniform> u_sun;
-    /** The shadow texture uniform */
-    std::shared_ptr<GLSLUniform> u_shadow[N_SHADOW_BUFFERS];
-    /** The light matrix uniform */
-    std::shared_ptr<GLSLUniform> u_lightMatrix[N_SHADOW_BUFFERS];
 
   public:
 
@@ -58,22 +50,6 @@ namespace graphics
     /** Set the projection matrix
      * @param m matrix pointer */
     void setMatrixProject(glm::mat4* m);
-
-    /** Set the eye direction
-     * @param eye eye vector */
-    void setEyeDir(glm::vec3* dir);
-
-    /** Set the sun direction
-     * @param sun sun direction */
-    void setSunDir(glm::vec3* dir);
-
-    /** Set the shadow texture id
-     * @param tex texture id */
-    void setShadowTex(GLint* tex);
-
-    /** Set the light matrix
-     * @param m matrix pointer */
-    void setMatrixLight(glm::mat4* m);
 
     /** Add a texture to this material
      * @param tex texture to add */

@@ -82,14 +82,6 @@ void DinosaurInstance::setMatrixProject(glm::mat4* project)
 {
   parent->mesh->setMatrixProject(project);
 }
-void DinosaurInstance::setEyeDir(glm::vec3* dir)
-{
-  parent->mesh->setEyeDir(dir);
-}
-void DinosaurInstance::setSunDir(glm::vec3* dir)
-{
-  parent->mesh->setSunDir(dir);
-}
 void DinosaurInstance::render()
 {
   parent->mesh->m_model = matrix;

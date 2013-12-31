@@ -4,6 +4,7 @@
 #include "graphics/mesh.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/fbo.hpp"
+#include "graphics/post.hpp"
 
 namespace graphics
 {
@@ -27,6 +28,14 @@ namespace graphics
     glm::mat4 m_light2[N_SHADOW_BUFFERS];
 
   public:
+
+    std::shared_ptr<graphics::GLFrameBuffer> fbo;
+    std::shared_ptr<graphics::GLPass> pass_color;
+    std::shared_ptr<graphics::GLPass> pass_normal;
+    std::shared_ptr<graphics::GLPass> pass_params; 
+    std::shared_ptr<graphics::GLPass> pass_position;
+    std::shared_ptr<graphics::GLSL> shader_deffered;
+    std::shared_ptr<graphics::Compositor> comp_deffered;
 
     /** The shadow buffer list */
     std::unique_ptr<GLFrameBuffer> b_shadow[N_SHADOW_BUFFERS];

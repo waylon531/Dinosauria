@@ -45,4 +45,4 @@ for f in srcFiles:
 
 dinosauria = env.Program('bin/dinosauria',
                          objects)
-env.AlwaysBuild(dinosauria)
+

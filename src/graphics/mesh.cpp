@@ -121,8 +121,3 @@ void graphics::Mesh::setMatrixProject(glm::mat4* project)
 {
   material->setMatrixProject(project);
 }
-
-void graphics::Mesh::setEyeDir(glm::vec3* dir)
-{
-  material->setEyeDir(dir);
-}

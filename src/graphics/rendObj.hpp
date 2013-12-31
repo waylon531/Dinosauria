@@ -34,16 +34,6 @@ namespace graphics
 
     /** Set the projection matrix */
     virtual void setMatrixProject(glm::mat4* project) =0;
-
-    /** Set the eye direction */
-    virtual void setEyeDir(glm::vec3* dir) =0;
-    /** Set the sun direction */
-    virtual void setSunDir(glm::vec3* dir) =0;
-
-    /** Set the shadow texture id */
-    virtual void setShadowTex(GLint* v) =0;
-    /** Set the light transform matrix */
-    virtual void setMatrixLight(glm::mat4* m) =0;
   };
 
 }

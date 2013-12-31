@@ -3,6 +3,6 @@
 <dinosaur name="Deinonychus"
 	  speed=".2">
   <description>The Deinonychus is a dinosaur.</description>
-  <mesh>res/models/deinony/DEINONYC.OBJ</mesh>
+  <mesh>res/models/deinony/d2.obj</mesh>
   <material>res/materials/blockasaurus.mat</material>
 </dinosaur>

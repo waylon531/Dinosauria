@@ -12,7 +12,6 @@ void graphics::Camera::use(std::shared_ptr<RenderableObjectExt> material)
 {
   material->setMatrixView(&mat_view);
   material->setMatrixProject(&mat_project);
-  material->setEyeDir(&dir);
 }
 
 void graphics::Camera::update()

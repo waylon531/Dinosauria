@@ -59,9 +59,6 @@ graphics::Material::Material(const std::string& fname)
   glm::mat4* m_model = NULL;
   glm::mat4* m_view = NULL;
   glm::mat4* m_project = NULL;
-  glm::vec3* eye = NULL;
-  glm::vec3* sun = NULL;
-  GLint* shadow = NULL;
   u_model = std::shared_ptr<GLSLUniform>(new GLSLUniform("m_model", m_model));
   uniforms.push_back(u_model);
   shader->attachUniform(u_model);
@@ -71,23 +68,6 @@ graphics::Material::Material(const std::string& fname)
   u_project = std::shared_ptr<GLSLUniform>(new GLSLUniform("m_project", m_project));
   uniforms.push_back(u_project);
   shader->attachUniform(u_project);
-  u_eye = std::shared_ptr<GLSLUniform>(new GLSLUniform("eyeDir", eye));
-  uniforms.push_back(u_eye);
-  shader->attachUniform(u_eye);
-  u_sun = std::shared_ptr<GLSLUniform>(new GLSLUniform("sunDir", sun));
-  uniforms.push_back(u_sun);
-  shader->attachUniform(u_sun);
-  for(int b=0; b<N_SHADOW_BUFFERS; b++)
-    {
-      u_shadow[b] = std::shared_ptr<GLSLUniform>(new GLSLUniform(("tex_shadow["+asString(b)+"]").c_str(), shadow));
-      uniforms.push_back(u_shadow[b]);
-      shader->attachUniform(u_shadow[b]);
-
-      u_lightMatrix[b] = std::shared_ptr<GLSLUniform>(new GLSLUniform(("m_light["+asString(b)+"]").c_str(), (glm::mat4*)NULL));
-      uniforms.push_back(u_lightMatrix[b]);
-      shader->attachUniform(u_lightMatrix[b]);
-
-    }
 }
 
 void graphics::Material::setMatrixModel(glm::mat4* m)
@@ -101,28 +81,6 @@ void graphics::Material::setMatrixView(glm::mat4* m)
 void graphics::Material::setMatrixProject(glm::mat4* m)
 {
   u_project->value = (void*)m;
-}
-void graphics::Material::setEyeDir(glm::vec3* dir)
-{
-  u_eye->value = (void*)dir;
-}
-void graphics::Material::setSunDir(glm::vec3* dir)
-{
-  u_sun->value = (void*)dir;
-}
-void graphics::Material::setShadowTex(GLint* tex)
-{
-  for(int b=0; b<N_SHADOW_BUFFERS; b++)
-    {
-      u_shadow[b]->value = (void*)&tex[b];
-    }
-}
-void graphics::Material::setMatrixLight(glm::mat4* m)
-{
-  for(int b=0; b<N_SHADOW_BUFFERS; b++)
-    {
-      u_lightMatrix[b]->value = (void*)&m[b];
-    }
 }
 
 void graphics::Material::addTexture(std::shared_ptr<GLTexture> tex)

@@ -9,6 +9,29 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
       b_shadow[b] = std::unique_ptr<GLFrameBuffer>(new GLFrameBuffer(SHADOW_W, SHADOW_H, true, "tex_shadow["+asString(b)+"]"));
       depthTexArray[b] = b_shadow[b]->id_tex_depth;
     }
+
+  fbo = MKPTR(graphics::GLFrameBuffer, W,H, true,"tex_depth");
+  pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
+  pass_normal = MKPTR(graphics::GLPass, fbo, 1, "tex_normal");
+  pass_position = MKPTR(graphics::GLPass, fbo, 2, "tex_position", GL_RGBA32F, GL_HALF_FLOAT);
+  pass_params = MKPTR(graphics::GLPass, fbo, 3, "tex_params", GL_RGBA32F, GL_HALF_FLOAT);
+  fbo->update();
+  shader_deffered = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/deffered.frag");
+  shader_deffered->attachUniform(pass_color->unif);
+  shader_deffered->attachUniform(pass_normal->unif);
+  shader_deffered->attachUniform(pass_params->unif);
+  shader_deffered->attachUniform(pass_position->unif);
+  shader_deffered->attachUniform(fbo->unif_depth);
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "eyeDir", &(cam->dir)));
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "sunDir", &sun));
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "m_view", &(cam->mat_view)));
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "m_project", &(cam->mat_project)));
+  for(int b=0; b<N_SHADOW_BUFFERS; b++)
+    {
+      shader_deffered->attachUniform(std::shared_ptr<GLSLUniform>(new GLSLUniform(("tex_shadow["+asString(b)+"]").c_str(), (GLint*)&depthTexArray[b])));
+      shader_deffered->attachUniform(std::shared_ptr<GLSLUniform>(new GLSLUniform(("m_light["+asString(b)+"]").c_str(), &m_light2[b])));
+    }
+  comp_deffered = MKPTR(graphics::Compositor, shader_deffered);
 }
 
 graphics::World::~World()
@@ -37,9 +60,9 @@ void graphics::World::removeMesh(std::shared_ptr<RenderableObjectExt> mesh)
 void graphics::World::use(std::shared_ptr<RenderableObjectExt> mesh)
 {
       camera->use(mesh);
-      mesh->setSunDir(&sun);
+      /*mesh->setSunDir(&sun);
       mesh->setShadowTex(depthTexArray);
-      mesh->setMatrixLight(m_light2);
+      mesh->setMatrixLight(m_light2);*/
 }
 
 void graphics::World::render()
@@ -65,10 +88,10 @@ void graphics::World::render()
 	{
 	  (*it)->setMatrixView(&m_lightView);
 	  (*it)->setMatrixProject(&m_lightProject);
-	  (*it)->setEyeDir(&sun);
+	  /*(*it)->setEyeDir(&sun);
 	  (*it)->setSunDir(&sun);
 	  (*it)->setShadowTex(depthTexArray);
-	  (*it)->setMatrixLight(m_light);
+	  (*it)->setMatrixLight(m_light);*/
 	  (*it)->renderShadowPass();
 	}
       m_light2[b] = m_bias * m_light[0];
@@ -80,13 +103,21 @@ void graphics::World::render()
     {
       b_shadow[b]->useTex();
     }
+  fbo->use();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
     {
       camera->use((*it));
-      (*it)->setSunDir(&sun);
-      (*it)->setShadowTex(depthTexArray);
-      (*it)->setMatrixLight(m_light2);
+      //(*it)->setSunDir(&sun);
+      //(*it)->setShadowTex(depthTexArray);
+      //(*it)->setMatrixLight(m_light2);
       (*it)->render();
-    }
+    } 
+  fbo->unuse();
+  fbo->useTex();
+  pass_color->useTex();
+  pass_normal->useTex();
+  pass_params->useTex();
+  pass_position->useTex();
+  comp_deffered->draw();
 }
-

@@ -70,10 +70,6 @@ public:
 
   void setMatrixView(glm::mat4* view) {material->setMatrixView(view); material_shadow->setMatrixView(view);}
   void setMatrixProject(glm::mat4* project) {material->setMatrixProject(project); material_shadow->setMatrixProject(project);}
-  void setEyeDir(glm::vec3* dir) {material->setEyeDir(dir); material_shadow->setEyeDir(dir);}
-  void setSunDir(glm::vec3* dir) {material->setSunDir(dir); material_shadow->setSunDir(dir);}
-  void setShadowTex(GLint* tex) {material->setShadowTex(tex); material_shadow->setShadowTex(tex);}
-  void setMatrixLight(glm::mat4* light) {material->setMatrixLight(light); material_shadow->setMatrixLight(light);}
   void renderShadowPass();
   void render();
 

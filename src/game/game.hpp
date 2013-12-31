@@ -63,8 +63,10 @@ private:
   /** Get the ideal camera position
    * @return ideal location of a camera */
   glm::vec3 getCameraLoc();
-  /** The camera-s focal length */
+  /** The camera's focal length */
   float focalLength;
+  /** The camera's distance from the player */
+  float camScale;
 
   int time;
 

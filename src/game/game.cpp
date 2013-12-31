@@ -8,6 +8,8 @@ Game::Game()
   graphics::u_time = std::shared_ptr<graphics::GLSLUniform>(new graphics::GLSLUniform("t",&time));
   camera = std::shared_ptr<graphics::Camera>(new graphics::Camera(CAMERA_START,
 								  glm::vec3(0.f,0.f,0.f)));
+  camScale = 1.0f;
+  
   world = std::shared_ptr<graphics::World>(new graphics::World(camera));
   sky = std::shared_ptr<graphics::Sky>(new graphics::Sky(glm::vec3(.2f,.2f,.5f)));
   ground = std::shared_ptr<Landscape>(new Landscape);
@@ -22,9 +24,9 @@ Game::Game()
   fbo->update();
   fbo_Cwater->update();
 
-  shader_Cwater = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert","res/effects/water.frag");
+  shader_Cwater = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert","res/effects/water_comp.frag");
   shader_Cwater->attachUniform(pass_color->unif);
-  shader_Cwater->attachUniform(fbo->unif_depth);
+  shader_Cwater->attachUniform(world->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
@@ -39,8 +41,8 @@ Game::Game()
   shader_Cfog->attachUniform(pass_Cwater_color->unif);
   comp_fog = MKPTR(graphics::Compositor,shader_Cfog);
 
-#define BLOOM_W (W)
-#define BLOOM_H (H)
+#define BLOOM_W (W/4)
+#define BLOOM_H (H/4)
   fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
   fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
   fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
@@ -82,7 +84,7 @@ Game::Game()
   shader_Cdof_final = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/dof.frag");
   shader_Cdof_final->attachUniform(pass_Cdof_color_vblur->unif);
   shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
-  shader_Cdof_final->attachUniform(fbo->unif_depth);
+  shader_Cdof_final->attachUniform(world->fbo->unif_depth);
   shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
   
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
@@ -146,7 +148,7 @@ void Game::start(float* value, float* value2, Callback& callback)
 
 glm::vec3 Game::getCameraLoc()
 {
-  return player->pos + glm::vec3(player->matrix * glm::vec4(CAMERA_POS,0.f));
+  return player->pos + glm::vec3(player->matrix * glm::vec4(camScale*CAMERA_POS,0.f));
 }
 
 void Game::save(const std::string& name)
@@ -208,7 +210,7 @@ void Game::render()
   fbo_Cwater->useTex();
   pass_Cwater_color->useTex();
   pass_Cwater_depth->useTex();
-
+  
   //bloom
   comp_bloom->shader = shader_Cbloom_sub;
   fbo_Cbloom_sub->use();
@@ -260,7 +262,6 @@ void Game::render()
 
   comp_bloom->shader = shader_Cdof_final;
   comp_bloom->draw();
-    
 }
 
 void Game::resetGame()
@@ -303,6 +304,15 @@ void Game::onKey(GLFWwindow* window)
   if(glfwGetKeyOnce(window,GLFW_KEY_Z) == GLFW_PRESS)
     {
       ground->isWireframe = 1-ground->isWireframe;
+    }
+  #define SCALE_INC 1.05
+  if(glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
+    {
+      camScale *= SCALE_INC;
+    }
+  if(glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
+    {
+      camScale /= SCALE_INC;
     }
   player->update(ground);
   camera->setLook(player->pos);

@@ -3,6 +3,6 @@
 <dinosaur name="Parasaur"
 	  speed=".1">
   <description>The Parasaur is a dinosaur.</description>
-  <mesh>res/models/parasour/PARASAUR.OBJ</mesh>
+  <mesh>res/models/parasour/p2.obj</mesh>
   <material>res/materials/blockasaurus.mat</material>
 </dinosaur>

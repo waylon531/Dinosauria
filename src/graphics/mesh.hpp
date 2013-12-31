@@ -71,10 +71,6 @@ namespace graphics
     void renderShadowPass();
     void setMatrixView(glm::mat4* view);
     void setMatrixProject(glm::mat4* project);
-    void setEyeDir(glm::vec3* dir);
-    void setSunDir(glm::vec3* dir) {material->setSunDir(dir);}
-    void setShadowTex(GLint* tex) {material->setShadowTex(tex);}
-    void setMatrixLight(glm::mat4* m) {material->setMatrixLight(m); u_light->value=m;}
     
     /** The material of the mesh */
     std::shared_ptr<Material> material;
