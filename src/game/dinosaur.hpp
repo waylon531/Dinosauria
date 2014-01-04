@@ -75,6 +75,10 @@ public:
 
   void setMatrixView(glm::mat4* view);
   void setMatrixProject(glm::mat4* project);
+  void setWaterFlag(int* wflag)
+  {
+    parent->mesh->setWaterFlag(wflag);
+  }
 
   void render();
 };

@@ -71,6 +71,7 @@ namespace graphics
     void renderShadowPass();
     void setMatrixView(glm::mat4* view);
     void setMatrixProject(glm::mat4* project);
+    void setWaterFlag(int* flag);
     
     /** The material of the mesh */
     std::shared_ptr<Material> material;

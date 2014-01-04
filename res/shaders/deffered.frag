@@ -24,7 +24,7 @@ float toDepth(float z)
 {
   float n = .5; // camera z near
   float f = 200.0; // camera z far
-  return (2.0 * n) / (f + n - z * (f - n));
+  return 2. * (2.0 * n) / (f + n - z * (f - n));
 }
 
 float rand(vec2 n)
@@ -82,11 +82,11 @@ float occluded(vec3 normal)
   //UV.y = 0.5 * coords.y + 0.5;
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
-  float bias = clamp(0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
+  float bias = clamp(0.01*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
   float depthS = texture2D(tex_shadow[b], UV).x;
   if(depthS < (depth - bias)) return 0.0;
   return 1.0;
-}      
+}
 
 #define AMBIENT .0
 #define AO .3

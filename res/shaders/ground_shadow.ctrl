@@ -21,8 +21,7 @@ bool offscreen(vec3 p)
 #define LOD_FACTOR .05
 float getOuterTessLevel(float area)
 {
-  return 2;
-  return clamp(area/LOD_FACTOR, 1, 1);
+  return clamp(area/LOD_FACTOR, 1, 32);
 }
 /*
 float getOuterTessLevel(float d)

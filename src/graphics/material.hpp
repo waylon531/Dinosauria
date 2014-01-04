@@ -29,6 +29,8 @@ namespace graphics
     std::shared_ptr<GLSLUniform> u_view;
     /** The projection matrix uniform */
     std::shared_ptr<GLSLUniform> u_project;
+    /** The water flag uniform */
+    std::shared_ptr<GLSLUniform> u_wflag;
 
   public:
 
@@ -50,6 +52,10 @@ namespace graphics
     /** Set the projection matrix
      * @param m matrix pointer */
     void setMatrixProject(glm::mat4* m);
+
+    /** Set the water flag
+     * @param f flag */
+    void setWaterFlag(int* flag);
 
     /** Add a texture to this material
      * @param tex texture to add */

@@ -44,6 +44,9 @@ private:
   
 public:
 
+  /** The view matrix to use for tesselation during the shadow pass */
+  glm::mat4* m_tessView;
+
   /** The wireframe rendering flag */
   GLuint isWireframe;
 
@@ -70,6 +73,7 @@ public:
 
   void setMatrixView(glm::mat4* view) {material->setMatrixView(view); material_shadow->setMatrixView(view);}
   void setMatrixProject(glm::mat4* project) {material->setMatrixProject(project); material_shadow->setMatrixProject(project);}
+  void setWaterFlag(int* wflag) {material->setWaterFlag(wflag); material_shadow->setWaterFlag(wflag);}
   void renderShadowPass();
   void render();
 

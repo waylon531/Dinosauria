@@ -49,6 +49,9 @@ namespace graphics
     /** The sun for this world */
     glm::vec3 sun;
 
+    /** If it is currently being rendered as a water pass */
+    int isWaterPass;
+
     /** Initialize from settings
      * @param cam camera for this world
      * @param s whether shadows should be used */

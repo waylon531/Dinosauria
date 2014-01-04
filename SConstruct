@@ -4,8 +4,8 @@ from colorizer import colorizer
 import doxygen
 env = Environment(CXX = "g++",
                   CXXFLAGS = '-std=c++0x -Isrc -Iexternal/include -I/usr/include',
-                  LINKFLAGS = '-std=c++0x -L/usr/lib -Lexternal/lib',
-                  LIBS = Split('m stdc++ rt GL GLU GLEW glfw3 Xxf86vm pthread Xrandr Xi freetype freetype-gl png assimp pugixml noise'),
+                  LINKFLAGS = '-std=c++0x -L/usr/lib -Lexternal/lib -L/usr/local/lib',
+                  LIBS = Split('m stdc++ rt GL GLU GLEW glfw3 Xxf86vm pthread Xrandr X11 Xi freetype freetype-gl png assimp pugixml noise'),
                   CPPPATH = ['src','external/include'],
                   tools = ['default'],
                   variant_dir='build')
@@ -30,7 +30,8 @@ conf = Configure(env)
 #        print "C header not found: "+h
 #        Exit(0)
 
-env['CXXFLAGS'] += ' -g'
+if not "release" in COMMAND_LINE_TARGETS:
+    env['CXXFLAGS'] += ' -g'
 
 #find source files recursively
 srcFiles = []
@@ -45,4 +46,5 @@ for f in srcFiles:
 
 dinosauria = env.Program('bin/dinosauria',
                          objects)
-
+env.AlwaysBuild(dinosauria)
+env.Alias("release",dinosauria)

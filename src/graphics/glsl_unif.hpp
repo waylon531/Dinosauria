@@ -23,6 +23,7 @@ namespace graphics
       UNIFORM_MAT2,
       UNIFORM_MAT3,
       UNIFORM_MAT4,
+      UNIFORM_BOOL
     };
 	
   /** @brief GLSL uniform wrapper 
@@ -93,6 +94,11 @@ namespace graphics
      * @param Name name of uniform 
      * @param Value value of uniform */
     GLSLUniform(const std::string& Name, glm::mat4* Value );
+
+    /** Initialize as boolean
+     * @param Name name of uniform
+     * @param Value value pointer */
+    GLSLUniform(const std::string& Name, bool* Value);
     
     /** @brief Destructor */
     ~GLSLUniform();

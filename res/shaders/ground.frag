@@ -11,6 +11,7 @@ uniform vec3 eyeDir;
 uniform vec3 sunDir;
 uniform unsigned int isWireframe;
 uniform mat4 m_light[N_SHADOW_BUFFERS];
+uniform int waterFlag;
 
 in vec3 vNormal;
 
@@ -25,45 +26,6 @@ layout (location=2) in vec3 gPosition;
 layout (location=3) in vec3 gPatchDist;
 layout (location=4) in vec4 gPositionSS;
 
-/*float occluded(vec3 normal)
-{
-  //if(sunDir.y < 0.f) return 0.f;
-  
-  int b;
-  vec4 coords;
-  vec2 UV;
-  float scale = 0.5;
-  for(b=0; b<N_SHADOW_BUFFERS; b++)
-    {
-      vec4 lightSpace = m_light[b] * vec4(gPosition,1.f);
-      coords = lightSpace / lightSpace.w;
-      UV = coords.xy;
-      if(!(UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) break;
-      scale *= 2.0;
-    }
-  if((UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) return 1.0;
-  //UV.x = 0.5 * coords.x + 0.5;
-  //UV.y = 0.5 * coords.y + 0.5;
-  //lightSpace /= lightSpace.w;
-  float depth = coords.z;
-  float bias = clamp(0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
-  float depthS = texture2D(tex_shadow[b], UV).x;
-  if(depthS < (depth - bias)) return 0.0;
-  return 1.0;
-}
-
-#define AMBIENT .2
-#define DIFFUSE .6
-#define SPECULAR 0.0
-vec3 computeLighting(vec3 base, vec3 normal)
-{
-  float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);
-  specular = pow(specular,2.0);
-  float diffuse = clamp(dot(normal,sunDir),0.0,1.0);
-  float ambient = 1.0;
-  return base*((SPECULAR*specular + DIFFUSE*diffuse)*occluded(normal) + AMBIENT*ambient);
-  }*/
-
 float amplify(float d, float scale , float offset)
 {
   d = scale * d + offset;
@@ -74,6 +36,15 @@ float amplify(float d, float scale , float offset)
 
 void main()
 {
+  if(waterFlag==1)
+    {
+      //culling
+      if(gPosition.y < 0.0f)
+	{
+	  discard;
+	}
+    }
+      
   vec3 normal = texture2D(tex_normal, gTexCoord.st).rgb;
   fNormal = vec4(normal,1.f);
   vec3 dirt = texture2D(tex_dirt, gPosition.xz*.1f).rgb;

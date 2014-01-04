@@ -2,7 +2,7 @@
 
 #define SHADOW_W (1024)
 #define SHADOW_H SHADOW_W
-graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool s) : camera(cam), sun(sunDir), hasShadows(s)
+graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool s) : camera(cam), sun(sunDir), hasShadows(s), isWaterPass(false)
 {
   for(int b=0; b<N_SHADOW_BUFFERS; b++)
     {
@@ -42,6 +42,7 @@ graphics::World::~World()
 void graphics::World::addMesh(std::shared_ptr<RenderableObjectExt> mesh)
 {
   meshs.push_back(mesh);
+  mesh->setWaterFlag(&isWaterPass);
 }
 
 void graphics::World::removeMesh(std::shared_ptr<RenderableObjectExt> mesh)
@@ -60,11 +61,13 @@ void graphics::World::removeMesh(std::shared_ptr<RenderableObjectExt> mesh)
 void graphics::World::use(std::shared_ptr<RenderableObjectExt> mesh)
 {
       camera->use(mesh);
+      mesh->setWaterFlag(&isWaterPass);
       /*mesh->setSunDir(&sun);
       mesh->setShadowTex(depthTexArray);
       mesh->setMatrixLight(m_light2);*/
 }
 
+int FALSE = 0;
 void graphics::World::render()
 {
   //shadow pass
@@ -88,6 +91,7 @@ void graphics::World::render()
 	{
 	  (*it)->setMatrixView(&m_lightView);
 	  (*it)->setMatrixProject(&m_lightProject);
+	  (*it)->setWaterFlag(&FALSE);
 	  /*(*it)->setEyeDir(&sun);
 	  (*it)->setSunDir(&sun);
 	  (*it)->setShadowTex(depthTexArray);
@@ -108,6 +112,7 @@ void graphics::World::render()
   for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
     {
       camera->use((*it));
+      (*it)->setWaterFlag(&isWaterPass);
       //(*it)->setSunDir(&sun);
       //(*it)->setShadowTex(depthTexArray);
       //(*it)->setMatrixLight(m_light2);

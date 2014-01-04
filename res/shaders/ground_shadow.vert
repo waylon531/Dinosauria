@@ -4,6 +4,7 @@ uniform mat4 m_model;
 uniform mat4 m_view;
 uniform mat4 m_project;
 uniform sampler2D tex_height;
+uniform mat4 m_tessView;
 
 layout (location=0) in vec3 position;
 in vec2 texCoord;
@@ -22,8 +23,8 @@ void main()
   mat4 PVM = m_project*m_view*m_model;
   gl_Position = PVM*vec4(positionh,1.f);
   vPositionWorld = (m_model * vec4(positionh,1.f)).xyz;
-  vec4 tmp = ((m_project*m_view*m_model) * vec4(positionh,1.f));
+  vec4 tmp = ((m_project*m_tessView*m_model) * vec4(positionh,1.f));
   vPositionEye = tmp.xyz/tmp.w;
-  vPositionCam = ((m_view*m_model) * vec4(positionh,1.0)).xyz;
+  vPositionCam = ((m_tessView*m_model) * vec4(positionh,1.0)).xyz;
   absPosition = vec4(position,1.0);
 }

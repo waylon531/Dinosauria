@@ -34,6 +34,9 @@ namespace graphics
 
     /** Set the projection matrix */
     virtual void setMatrixProject(glm::mat4* project) =0;
+
+    /** Set water flag */
+    virtual void setWaterFlag(int* flag) =0;
   };
 
 }

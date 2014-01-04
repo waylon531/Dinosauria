@@ -1,7 +1,7 @@
 <!DOCTYPE xml>
 
 <dinosaur name="Triceratops"
-	  speed=".05">
+	  speed=".2">
   <description>The Triceratops is a dinosaur.</description>
   <mesh>res/models/TRICERTP/TRICERTP.OBJ</mesh>
   <material>res/materials/blockasaurus.mat</material>

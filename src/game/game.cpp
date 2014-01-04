@@ -18,6 +18,9 @@ Game::Game()
   
   fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
   pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
+  fbo_reflection = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth_reverse");
+  pass_color_reflection = MKPTR(graphics::GLPass, fbo_reflection, 0, "tex_color_reverse", GL_RGBA32F, GL_HALF_FLOAT);
+  fbo_reflection->update();
   fbo_Cwater = MKPTR(graphics::GLFrameBuffer, W,H, false);
   pass_Cwater_color = MKPTR(graphics::GLPass, fbo_Cwater, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_Cwater_depth = MKPTR(graphics::GLPass, fbo_Cwater, 1, "tex_depth");
@@ -26,6 +29,8 @@ Game::Game()
 
   shader_Cwater = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert","res/effects/water_comp.frag");
   shader_Cwater->attachUniform(pass_color->unif);
+  shader_Cwater->attachUniform(fbo_reflection->unif_depth);
+  shader_Cwater->attachUniform(pass_color_reflection->unif);
   shader_Cwater->attachUniform(world->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->pass_color->unif);
@@ -179,7 +184,8 @@ void Game::render()
   camera->setPos(camera->pos*(1.0f-ALPHA) + camLoc*ALPHA);
   float cmax = ground->eval(camera->pos.x, camera->pos.z) + 2.0;
   if(camera->pos.y <= cmax) camera->setPos(glm::vec3(camera->pos.x, cmax, camera->pos.z));
-  focalLength = glm::length(camera->pos - player->pos);
+  focalLength = glm::distance(camera->pos , player->pos);
+  *ground->m_tessView = camera->mat_view;
 #undef ALPHA
   time++;
   float angle = (float)time/1000.0f;
@@ -187,6 +193,17 @@ void Game::render()
   world->sun = glm::normalize(glm::vec3(cosa*.25f,sin(angle),cosa*.75f));
   //world->sun = glm::normalize(glm::vec3(1.01f,1.01f,1.01f));
 
+  fbo_reflection->use();
+  pass_color_reflection->use();
+  world->isWaterPass = 1;
+  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+  sky->render();
+  world->render();
+  fbo_reflection->unuse();
+  pass_color_reflection->useTex();
+  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+  world->isWaterPass = 0;
+  
   fbo->use();
   pass_color->use();
   sky->render();

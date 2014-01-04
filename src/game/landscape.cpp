@@ -6,6 +6,8 @@ Landscape::Landscape() : isWireframe(0)
   material_shadow = std::unique_ptr<graphics::Material>(new graphics::Material("res/materials/ground_shadow.mat"));
   material->addUniform(std::shared_ptr<graphics::GLSLUniform>(new graphics::GLSLUniform("tessMax", &tessMax)));
   material->addUniform(std::shared_ptr<graphics::GLSLUniform>(new graphics::GLSLUniform("isWireframe",&isWireframe)));
+  m_tessView = new glm::mat4;
+  material_shadow->addUniform(MKPTR(graphics::GLSLUniform, "m_tessView", m_tessView));
   //material->addTexture(std::shared_ptr<graphics::GLTexture2D>(new graphics::GLTexture2D("res/textures/dirt.png","tex_dirt")));
 
 #define SCALE 500.f
@@ -133,8 +135,8 @@ void Landscape::render()
 {
   tessMax = 64;
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
   material->setMatrixModel(&m_model);
   material->use();
   b_verts->use();

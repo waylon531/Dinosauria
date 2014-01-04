@@ -59,6 +59,7 @@ graphics::Material::Material(const std::string& fname)
   glm::mat4* m_model = NULL;
   glm::mat4* m_view = NULL;
   glm::mat4* m_project = NULL;
+  int* wflag = NULL;
   u_model = std::shared_ptr<GLSLUniform>(new GLSLUniform("m_model", m_model));
   uniforms.push_back(u_model);
   shader->attachUniform(u_model);
@@ -68,6 +69,9 @@ graphics::Material::Material(const std::string& fname)
   u_project = std::shared_ptr<GLSLUniform>(new GLSLUniform("m_project", m_project));
   uniforms.push_back(u_project);
   shader->attachUniform(u_project);
+  u_wflag = MKPTR(GLSLUniform,"waterFlag", wflag);
+  uniforms.push_back(u_wflag);
+  shader->attachUniform(u_wflag);
 }
 
 void graphics::Material::setMatrixModel(glm::mat4* m)
@@ -81,6 +85,10 @@ void graphics::Material::setMatrixView(glm::mat4* m)
 void graphics::Material::setMatrixProject(glm::mat4* m)
 {
   u_project->value = (void*)m;
+}
+void graphics::Material::setWaterFlag(int* flag)
+{
+  u_wflag->value = (void*)flag;
 }
 
 void graphics::Material::addTexture(std::shared_ptr<GLTexture> tex)
@@ -101,6 +109,7 @@ graphics::Material::~Material()
   u_model.reset();
   u_view.reset();
   u_project.reset();
+  u_wflag.reset();
   //u_shadow.reset();
   //u_lightMatrix.reset();
 }

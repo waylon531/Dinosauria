@@ -47,6 +47,7 @@ Ocean::~Ocean()
   delete[] verts;
 }
 
+extern int FALSE;
 void Ocean::render(std::shared_ptr<graphics::World> world)
 {
   //draw the texture
@@ -63,6 +64,7 @@ void Ocean::render(std::shared_ptr<graphics::World> world)
   material->setMatrixProject(m_project);
   material->setMatrixView(m_view);
   material->setMatrixModel(&m_model);
+  material->setWaterFlag(&FALSE);
   /*material->setEyeDir(eye);
   material->setSunDir(sun);
   material->setShadowTex(tex_shadow);

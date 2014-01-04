@@ -121,3 +121,8 @@ void graphics::Mesh::setMatrixProject(glm::mat4* project)
 {
   material->setMatrixProject(project);
 }
+
+void graphics::Mesh::setWaterFlag(int* flag)
+{
+  material->setWaterFlag(flag);
+}

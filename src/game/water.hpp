@@ -63,6 +63,7 @@ public:
   void setSunDir(glm::vec3* dir){sun = dir;}
   void setEyeDir(glm::vec3* dir){eye = dir;}
   void setShadowTex(GLint* tex){tex_shadow = tex;}
+  void setWaterFlag(int* flag) {}
 
   /** Render the ocean
    * @param world world to render */
