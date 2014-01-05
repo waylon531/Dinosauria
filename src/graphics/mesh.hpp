@@ -55,7 +55,7 @@ namespace graphics
     /** Initialize from a file
      * @param fname filename for mesh
      * @param mat material for this mesh */
-    Mesh(const std::string& fname, std::shared_ptr<Material> mat);
+    Mesh(const std::string& fname, std::shared_ptr<Material> mat, bool isBin=false);
 
     /** Initialize from veritces and indices
      * @param v vertex array

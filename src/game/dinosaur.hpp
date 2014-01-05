@@ -2,6 +2,7 @@
 /** @file game/dinosaur.hpp */
 
 #include "graphics/mesh.hpp"
+#include "graphics/bmesh.hpp"
 #include <pugixml.hpp>
 #include "game/landscape.hpp"
 
@@ -10,7 +11,7 @@ class Dinosaur: public graphics::RenderableObject
 {
 public:
   /** The dinosaur's mesh */
-  std::shared_ptr<graphics::Mesh> mesh;
+  std::shared_ptr<graphics::SkeletalMesh> mesh;
 
   /** The dinosaur's material */
   std::shared_ptr<graphics::Material> material;

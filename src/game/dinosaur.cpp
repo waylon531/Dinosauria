@@ -19,7 +19,12 @@ Dinosaur::Dinosaur(const std::string& fname)
       speed = root.attribute("speed").as_float();
       description = root.child_value("description");
       material = std::shared_ptr<graphics::Material>(new graphics::Material(root.child_value("material")));
-      mesh = std::shared_ptr<graphics::Mesh>(new graphics::Mesh(root.child_value("mesh"), material));
+      bool isBin=false;
+      if(root.child("mesh").attribute("bin") != NULL)
+	{
+	  isBin = true;
+	}
+      mesh = MKPTR(graphics::SkeletalMesh, root.child_value("mesh"), material, isBin);
     }
 }
 

@@ -37,7 +37,8 @@ if not "release" in COMMAND_LINE_TARGETS:
 srcFiles = []
 for root,dirnames,filenames in os.walk('src'):
     for filename in fnmatch.filter(filenames,'*.cpp'):
-        srcFiles.append(os.path.join(root, filename))
+        if filename!="converter.cpp" and filename!="bconverter.cpp":
+            srcFiles.append(os.path.join(root, filename))
 
 #build objects
 objects = []
@@ -46,5 +47,9 @@ for f in srcFiles:
 
 dinosauria = env.Program('bin/dinosauria',
                          objects)
+converter = env.Program('bin/convert', 'src/converter.cpp')
+bconverter = env.Program('bin/bconvert', 'src/bconverter.cpp')
+env.AlwaysBuild(converter)
+env.AlwaysBuild(bconverter)
 env.AlwaysBuild(dinosauria)
 env.Alias("release",dinosauria)

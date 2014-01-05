@@ -27,14 +27,16 @@ namespace graphics
     int dataSize;
     /** @brief Number of GLfloats in this attribute */
     int numFloats;
+
   public:
     //public methods
-		
+
+    GLenum type;		
     /** @brief Create the info class 
      * 
      * @param name name of attribute used in GLSL programs
      * @param sizeo size of attribute, not in bytes, but in number of glFloats*/
-    GLSLAttribute(const char* name, const int size);
+    GLSLAttribute(const char* name, const int size, GLenum t=GL_FLOAT);
 		
     /** @brief default constructor */
     GLSLAttribute(){}

@@ -1,0 +1,32 @@
+<scene export_time="1388948668.0756226" previous_export_time="1388948631.222424" exported_by="root" formatVersion="1.0.1" >
+  <nodes >
+    <node name="Armature" >
+      <position x="0.000000" y="0.000000" z="-0.000000" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+    </node>
+    <node name="dei_body" >
+      <position x="0.000000" y="0.000000" z="-0.000000" />
+      <rotation qw="0.707107" qx="0.707107" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <user_data name="luxrender_object" type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBdei_body", name="luxrender_object", address=0xae7ce760&gt;' />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity anisotropic_friction="False" lock_trans_z="False" lock_trans_x="False" physics_type="STATIC" meshFile="dei_body.mesh" friction_x="1.0" friction_y="1.0" friction_z="1.0" damping_trans="0.03999999910593033" velocity_max="0.0" name="dei_body" ghost="False" mass="1.0" damping_rot="0.10000000149011612" actor="False" lock_trans_y="False" velocity_min="0.0" inertia_tensor="0.4000000059604645" mass_radius="1.0" lock_rot_y="False" lock_rot_x="False" lock_rot_z="False" >
+        <user_data name="luxrender_mesh" type="IDPropertyGroup" value='&lt;bpy id prop: owner="MEdei_body", name="luxrender_mesh", address=0xae7ce8a0&gt;' />
+      </entity>
+    </node>
+  </nodes>
+  <externals />
+  <environment >
+    <colourAmbient g="0.0" b="0.0" r="0.0" />
+    <colourBackground g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+    <colourDiffuse g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+  </environment>
+</scene>
