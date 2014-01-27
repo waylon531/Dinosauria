@@ -16,7 +16,7 @@ GLSLAttribute::GLSLAttribute(const char* Name, const int size, GLenum t)
       dataSize = size*sizeof(GLfloat);
       break;
     case GL_INT:
-      dataSize = size*sizeof(GLfloat);
+      dataSize = size*sizeof(GLint);
       break;
     };
 }
@@ -78,11 +78,11 @@ void GLSLAttributeSet::use()
 	{
 		glEnableVertexAttribArray(ind);
 		glVertexAttribPointer(ind, 
-				attributes.at(ind).getNumFloats(), //number of GLfloats
-				attributes[ind].type, //type
-				GL_FALSE, //do not normalize
-				stride, //stride
-				(void*)indexedOffset.at(ind)); //offset
+				      attributes.at(ind).getNumFloats(), //number of GLfloats
+				      attributes[ind].type, //type
+				      GL_FALSE, //do not normalize
+				      stride, //stride
+				      (void*)indexedOffset.at(ind)); //offset
 	}
 }
 

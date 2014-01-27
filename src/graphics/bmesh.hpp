@@ -33,6 +33,46 @@ namespace graphics
       {
       }
     };
+
+    struct RotationKeyframe
+    {
+      glm::quat value;
+      float time;
+      RotationKeyframe()
+      {
+      }
+    };
+    
+    struct TranslationKeyframe
+    {
+      glm::vec3 value;
+      float time;
+      TranslationKeyframe()
+      {
+      }
+    };
+    
+    
+    struct ActionNode
+    {
+      int boneId;
+      std::vector<RotationKeyframe> rotkeys;
+      std::vector<TranslationKeyframe> lockeys;
+      std::vector<int> children;
+      ActionNode()
+      {
+      }
+      ActionNode(int id, std::vector<int> c, std::vector<RotationKeyframe> rkeys, std::vector<TranslationKeyframe> lkeys) : boneId(id), children(c), rotkeys(rkeys), lockeys(lkeys)
+      {
+      }
+    };
+    struct Action
+    {
+      std::vector<ActionNode> nodes;
+      Action()
+      {
+      }
+    };
     
   private:
 
@@ -44,6 +84,7 @@ namespace graphics
 
     /** The bone array */
     std::vector<Bone> bones;
+    Action anim;
 
     /** The vertex buffer */
     std::unique_ptr<GLVertexBuffer> b_vert;
@@ -59,6 +100,30 @@ namespace graphics
     /** Initialize the shadow shader */
     void initShadow();
 
+    /** Get the interpolated rotation matrix
+     * @param time the current time
+     * @param node the action node to interpolate on
+     * @return rotation quaternion */
+    glm::quat interpRotation(const float time, const ActionNode& node) const;
+
+    /** Get the interpolated translate matrix
+     * @param time the current time
+     * @param node the action node to interpolate on
+     * @return translation vector */
+    glm::vec3 interpTranslation(const float time, const ActionNode& node) const;
+
+    /** Get the full interpolated matrix
+     * @param time the current time
+     * @param node the action node to interpolate on
+     * @return interpolated animation matrix for the bone */
+    glm::mat4 interpMatrix(const float time, const ActionNode& node) const;
+
+    /** Read the heirarchy of nodes and set their transforms
+     * @param node the node to be reading from
+     * @param ptrans the parent's transformation matrix
+     * @param time animation time */
+    void readNodes(const ActionNode& node, const glm::mat4& ptrans, const float time);
+    
   public:
 
     /** The model matrix */
@@ -78,6 +143,9 @@ namespace graphics
 
     /** Destroy */
     ~SkeletalMesh();
+
+    /** Set the animation time */
+    void setTime(const float t);
 
     void render();
     void renderShadowPass();

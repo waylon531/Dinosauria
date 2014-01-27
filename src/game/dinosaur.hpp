@@ -58,6 +58,9 @@ public:
   /** The model matrix */
   glm::mat4 matrix;
 
+  /** The current clock */
+  float time;
+
   /** Initialize from a parent
    * @param dino parent dinosaur template */
   DinosaurInstance(std::shared_ptr<Dinosaur> dino);

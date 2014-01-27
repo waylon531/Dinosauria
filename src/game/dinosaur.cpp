@@ -51,10 +51,12 @@ void Dinosaur::render()
 
 DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), zrot(0.f)
 {
+  time = 0;
 }
 
 DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
 {
+  time = 0;
   parent = getDinosaur(node.attribute("name").value());
   pos = parseVec3(node.attribute("pos").value());
   zrot = node.attribute("rot").as_float();
@@ -89,6 +91,9 @@ void DinosaurInstance::setMatrixProject(glm::mat4* project)
 }
 void DinosaurInstance::render()
 {
+  time += 0.01;
+  if(time > 20.0) time = 0.0;
+  parent->mesh->setTime(time);
   parent->mesh->m_model = matrix;
   parent->render();
 }
