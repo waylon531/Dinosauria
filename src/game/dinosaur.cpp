@@ -19,7 +19,16 @@ Dinosaur::Dinosaur(const std::string& fname)
       speed = root.attribute("speed").as_float();
       description = root.child_value("description");
       material = std::shared_ptr<graphics::Material>(new graphics::Material(root.child_value("material")));
+<<<<<<< HEAD
       mesh = std::shared_ptr<graphics::Mesh>(new graphics::Mesh(root.child_value("mesh"), material));
+=======
+      bool isBin=false;
+      if(root.child("mesh").attribute("bin") != NULL)
+	{
+	  isBin = true;
+	}
+      mesh = MKPTR(graphics::SkeletalMesh, root.child_value("mesh"), material, isBin);
+>>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
     }
 }
 
@@ -46,10 +55,18 @@ void Dinosaur::render()
 
 DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), zrot(0.f)
 {
+<<<<<<< HEAD
+=======
+  time = 0;
+>>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 }
 
 DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
 {
+<<<<<<< HEAD
+=======
+  time = 0;
+>>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   parent = getDinosaur(node.attribute("name").value());
   pos = parseVec3(node.attribute("pos").value());
   zrot = node.attribute("rot").as_float();
@@ -84,6 +101,12 @@ void DinosaurInstance::setMatrixProject(glm::mat4* project)
 }
 void DinosaurInstance::render()
 {
+<<<<<<< HEAD
+=======
+  time += 0.01;
+  if(time > 20.0) time = 0.0;
+  parent->mesh->setTime(time);
+>>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   parent->mesh->m_model = matrix;
   parent->render();
 }
