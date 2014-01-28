@@ -5,8 +5,10 @@ This is a game from the perspective of a dinosaur with the goal of being very re
 
 ##Compiling
 In the "dinosauira" root direcotry, type:
-```cmake -"Unix Makefiles" #or whatever type of build you want to generate
-make -j2```
+```
+cmake -"Unix Makefiles" #or whatever type of build you want to generate
+make -j2
+```
 Note that if you want documentation to be generated, you must have doxygen installed. In addition, if you want inheritance graphs, you must have graphviz dot installed.
   
 ##License
