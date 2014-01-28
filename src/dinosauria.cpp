@@ -267,13 +267,8 @@ public:
     button_start = std::shared_ptr<gui::Button>(new gui::Button("Start", glm::vec2(600,50), Callback(this, _call_start)));
     gui->addWidget(button_start);
     addSubframe(std::shared_ptr<DinoFrame>(new DinoFrame(dinosaurs[0],100,500, &current_dino, &time)));
-<<<<<<< HEAD
-    addSubframe(std::shared_ptr<DinoFrame>(new DinoFrame(dinosaurs[1],400,500, &current_dino, &time)));
-    addSubframe(std::shared_ptr<DinoFrame>(new DinoFrame(dinosaurs[2],700,500, &current_dino, &time)));
-=======
     //addSubframe(std::shared_ptr<DinoFrame>(new DinoFrame(dinosaurs[1],400,500, &current_dino, &time)));
     //addSubframe(std::shared_ptr<DinoFrame>(new DinoFrame(dinosaurs[2],700,500, &current_dino, &time)));
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   }
   ~NewGameMenu()
   {
@@ -430,15 +425,9 @@ public:
 
 void initAllDinos()
 {
-<<<<<<< HEAD
-  dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/triceratops.xml")));
-  dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/deinonychus.xml")));
-  dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/parasaur.xml")));
-=======
   //dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/triceratops.xml")));
   dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/deinonychus.xml")));
   //dinosaurs.push_back(std::shared_ptr<Dinosaur>(new Dinosaur("res/dinos/parasaur.xml")));
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 }
 
 #include <GL/glu.h>

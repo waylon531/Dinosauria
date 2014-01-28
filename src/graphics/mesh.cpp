@@ -5,58 +5,6 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 
-<<<<<<< HEAD
-graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m)
-{
-  material = m;
-  //import
-  Assimp::Importer importer;
-#define NORMAL_TYPE aiProcess_GenSmoothNormals
-  const aiScene* pScene = importer.ReadFile(fname.c_str(), aiProcess_Triangulate | NORMAL_TYPE);
-  if(pScene)
-    {
-      int nv=0;
-      int nt=0;
-      for(unsigned int i=0; i<pScene->mNumMeshes; i++)
-	{
-	  nv += pScene->mMeshes[i]->mNumVertices;
-	  nt += pScene->mMeshes[i]->mNumFaces;
-	}
-      verts = new attrib[nv];
-      inds = new GLuint[nt*3];
-      for(unsigned int mi=0; mi<pScene->mNumMeshes; mi++)
-	{
-	  const aiMesh* mesh = pScene->mMeshes[mi];
-	  const aiVector3D Zero3D(0.0f,0.0f,0.0f);
-	  for(unsigned int i=0; i<mesh->mNumVertices; i++)
-	    {
-	      const aiVector3D* pos = &(mesh->mVertices[i]);
-	      const aiVector3D* normal = &(mesh->mNormals[i]);
-	      const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
-	      attrib v = (attrib){glm::vec3(pos->x, pos->y, pos->z),
-				  glm::vec3(normal->x, normal->y, normal->z),
-				  glm::vec2(texCoord->x, texCoord->y)};
-	      verts[i] = v;
-	    }
-	  for(unsigned int i=0; i<mesh->mNumFaces; i++)
-	    {
-	      const aiFace& f = mesh->mFaces[i];
-	      inds[i*3+0] = f.mIndices[0];
-	      inds[i*3+1] = f.mIndices[1];
-	      inds[i*3+2] = f.mIndices[2];
-	    }
-	}
-      GLSLAttributeSet attrs(std::vector<GLSLAttribute>({GLSLAttribute("position",3), GLSLAttribute("normal",3), GLSLAttribute("texCoord",2)}));
-      b_vert = std::unique_ptr<GLVertexBuffer>(new GLVertexBuffer(verts, nv, attrs));
-      b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, nt*3));
-    }
-  else
-    {
-      std::cout << "Error parsing '" << fname.c_str() << "': '" << importer.GetErrorString() << std::endl;
-    }
-  m_model = glm::mat4();
-  initShadow();
-=======
 graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool isBin)
 {
   int nv,nt;
@@ -125,7 +73,6 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
   b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, nt*3));
   m_model = glm::mat4();
   initShadow();  
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 }
 
 graphics::Mesh::Mesh(attrib* v, GLuint* i, const int nv, const int ni, std::shared_ptr<Material> m)

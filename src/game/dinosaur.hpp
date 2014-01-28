@@ -2,10 +2,7 @@
 /** @file game/dinosaur.hpp */
 
 #include "graphics/mesh.hpp"
-<<<<<<< HEAD
-=======
 #include "graphics/bmesh.hpp"
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 #include <pugixml.hpp>
 #include "game/landscape.hpp"
 
@@ -14,11 +11,7 @@ class Dinosaur: public graphics::RenderableObject
 {
 public:
   /** The dinosaur's mesh */
-<<<<<<< HEAD
-  std::shared_ptr<graphics::Mesh> mesh;
-=======
   std::shared_ptr<graphics::SkeletalMesh> mesh;
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 
   /** The dinosaur's material */
   std::shared_ptr<graphics::Material> material;
@@ -65,12 +58,9 @@ public:
   /** The model matrix */
   glm::mat4 matrix;
 
-<<<<<<< HEAD
-=======
   /** The current clock */
   float time;
 
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   /** Initialize from a parent
    * @param dino parent dinosaur template */
   DinosaurInstance(std::shared_ptr<Dinosaur> dino);

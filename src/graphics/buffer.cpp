@@ -3,15 +3,6 @@ using namespace graphics;
 
 //GLSLAttribute methods
 
-<<<<<<< HEAD
-GLSLAttribute::GLSLAttribute(const char* Name, const int size)
-{
-	const int len = strlen(Name);
-	name = new char[len];
-	name = (char*)memcpy(name,Name,len*sizeof(char));
-	numFloats = size;
-	dataSize = size*sizeof(GLfloat);
-=======
 GLSLAttribute::GLSLAttribute(const char* Name, const int size, GLenum t)
 {
   type = t;
@@ -28,7 +19,6 @@ GLSLAttribute::GLSLAttribute(const char* Name, const int size, GLenum t)
       dataSize = size*sizeof(GLint);
       break;
     };
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 }
 
 GLSLAttribute::~GLSLAttribute()
@@ -88,19 +78,11 @@ void GLSLAttributeSet::use()
 	{
 		glEnableVertexAttribArray(ind);
 		glVertexAttribPointer(ind, 
-<<<<<<< HEAD
-				attributes.at(ind).getNumFloats(), //number of GLfloats
-				GL_FLOAT, //type
-				GL_FALSE, //do not normalize
-				stride, //stride
-				(void*)indexedOffset.at(ind)); //offset
-=======
 				      attributes.at(ind).getNumFloats(), //number of GLfloats
 				      attributes[ind].type, //type
 				      GL_FALSE, //do not normalize
 				      stride, //stride
 				      (void*)indexedOffset.at(ind)); //offset
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 	}
 }
 

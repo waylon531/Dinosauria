@@ -3,19 +3,13 @@
 uniform mat4 m_model;
 uniform mat4 m_view;
 uniform mat4 m_project;
-<<<<<<< HEAD
-=======
 uniform mat4 boneTransforms[32];
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 
 layout (location=0) in vec3 position;
 layout (location=1) in vec3 normal;
 layout (location=2) in vec2 texCoord;
-<<<<<<< HEAD
-=======
 layout (location=3) in ivec4 boneIds;
 layout (location=4) in vec4 boneWeights;
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
 
 out vec3 vNormal;
 out vec2 vTexCoord;
@@ -24,11 +18,6 @@ out vec4 vPositionView;
 
 void main()
 {
-<<<<<<< HEAD
-  mat4 PVM = m_project*m_view*m_model;
-  gl_Position = PVM*vec4(position,1.f);
-  vPosition = m_model*vec4(position,1.f);
-=======
   mat4 m_model2 = mat4(1,0,0,0,
 		       0,1,0,0,
 		       0,0,1,0,
@@ -42,7 +31,6 @@ void main()
   mat4 PVM = m_project*m_view*m_model;
   gl_Position = PVM*vec4(position2,1.f);
   vPosition = m_model*vec4(position2,1.f);
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   vPositionView = gl_Position;
   vNormal = (m_model * vec4(normal,0.f)).xyz;
   vTexCoord = texCoord;
