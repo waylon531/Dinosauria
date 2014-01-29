@@ -1,0 +1,69 @@
+#version 410
+
+layout (vertices = 4) out;
+
+in vec2 vTexCoord[];
+in vec3 vPositionWorld[];
+in vec3 vPositionEye[];
+in vec3 vPositionCam[];
+in vec4 absPosition[];
+
+out vec2 cTexCoord[];
+out vec3 cPosition[];
+out vec4 cAbsPosition[];
+
+bool offscreen(vec3 p)
+{
+#define BUFFER 2.0
+  return ((p.x<-BUFFER) || (p.x>BUFFER) || (p.y<-BUFFER) || (p.y>BUFFER));
+}
+
+#define LOD_FACTOR .05
+float getOuterTessLevel(float area)
+{
+  return clamp(area/LOD_FACTOR, 1, 32);
+}
+/*
+float getOuterTessLevel(float d)
+{
+  //return 1.0;
+  return clamp(5.0*d, 1, 8);
+}
+*/
+void main()
+{
+#define id gl_InvocationID
+  cTexCoord[id] = vTexCoord[id];
+  cPosition[id] = vPositionWorld[id];
+  cAbsPosition[id] = absPosition[id];
+  #define c0 vPositionEye[0]
+  #define c1 vPositionEye[1]
+  #define c2 vPositionEye[2]
+  #define c3 vPositionEye[3]
+  float l0,l1,l2,l3;
+  if(offscreen(c0) && offscreen(c1) && offscreen(c2) && offscreen(c3))
+    {
+      l0=0.0;
+      l1=0.0;
+      l2=0.0;
+      l3=0.0;
+    }
+  else
+    {
+      float d0 = distance(c2,c0);
+      float d1 = distance(c0,c1);
+      float d2 = distance(c1,c3);
+      float d3 = distance(c2,c3);
+      l0 = getOuterTessLevel(d0);
+      l1 = getOuterTessLevel(d1);
+      l2 = getOuterTessLevel(d2);
+      l3 = getOuterTessLevel(d3);
+    }
+  
+  gl_TessLevelOuter[0] = l0;
+  gl_TessLevelOuter[1] = l1;
+  gl_TessLevelOuter[2] = l2;
+  gl_TessLevelOuter[3] = l3;
+  gl_TessLevelInner[0] = mix(l1,l2,.5);//max(gl_TessLevelOuter[0],gl_TessLevelOuter[1]);
+  gl_TessLevelInner[1] = mix(l0,l3,.5);//max(gl_TessLevelOuter[2],gl_TessLevelOuter[3]);
+}

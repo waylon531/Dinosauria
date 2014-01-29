@@ -1,0 +1,8 @@
+<!DOCTYPE xml>
+
+<dinosaur name="Deinonychus"
+	  speed=".75">
+  <description>The Deinonychus is a dinosaur.</description>
+  <mesh bin="true">res/models/deinony/d2.mesh</mesh>
+  <material>res/materials/blockasaurus.mat</material>
+</dinosaur>

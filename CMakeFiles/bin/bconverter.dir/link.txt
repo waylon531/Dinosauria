@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wno-shadow  -Wno-shadow -std=c++0x  -L/usr/local/lib -Lexternal/lib   CMakeFiles/bin/bconverter.dir/converters/bconverter.cpp.o  -o bin/bconverter -rdynamic -lassimp 

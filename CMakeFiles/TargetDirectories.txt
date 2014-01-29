@@ -1,0 +1,3 @@
+/root/projects/dinosauria/CMakeFiles/bin/bconverter.dir
+/root/projects/dinosauria/CMakeFiles/bin/converter.dir
+/root/projects/dinosauria/CMakeFiles/bin/dinosauria.dir
