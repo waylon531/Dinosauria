@@ -3,10 +3,6 @@
 <dinosaur name="Triceratops"
 	  speed=".2">
   <description>The Triceratops is a dinosaur.</description>
-<<<<<<< HEAD
-  <mesh>res/models/TRICERTP/TRICERTP.OBJ</mesh>
-=======
   <mesh bin="true">res/models/TRICERTP/TRICERTP.mesh</mesh>
->>>>>>> 66660550aeb608a7b118ba234eb0de03df417e5f
   <material>res/materials/blockasaurus.mat</material>
 </dinosaur>

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(Dinosauria)
+set(Dinosauria_VERSION_MAJOR 0)
+set(Dinosauria_VERSION_MINOR 2-beta)
 
 set(CMAKE_USE_RELATIVE_PATHS true)
 
@@ -14,11 +16,12 @@ include_directories(src external/include)
 
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Lexternal/lib")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
 
 if(APPLE)
-	set(CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
+	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
-	set(CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++0x)
+	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 endif()
 
 if(UNIX)
@@ -75,3 +78,36 @@ target_link_libraries(bin/bconverter assimp)
 target_link_libraries(bin/dinosauria assimp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
+
+#CPack installation
+
+install(TARGETS bin/dinosauria
+RUNTIME DESTINATION bin
+LIBRARY DESTINATION bin
+)
+
+install(DIRECTORY
+res
+DESTINATION ./
+FILES_MATCHING
+PATTERN "*.xml"
+PATTERN "*.mat"
+PATTERN "*.frag"
+PATTERN "*.vert"
+PATTERN "*.geom"
+PATTERN "*.ctrl"
+PATTERN "*.glh"
+PATTERN "*.eval"
+PATTERN "*.ttf"
+PATTERN "*.png"
+PATTERN "*.OBJ"
+PATTERN "*.obj"
+PATTERN "*.mesh"
+)
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "Dinosauria")
+set(CPACK_PACKAGE_VERSION "${Dinosauria_VERSION_MAJOR}.${Dinosauria_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${Dinosauria_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR "${Dinosauria_VERSION_MINOR})
+include(CPack)
