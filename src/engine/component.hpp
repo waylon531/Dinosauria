@@ -13,7 +13,7 @@ namespace engine
   
   /** Get the id for a given name
    * This will create a new entry in the table if the name has not been used before */
-  unsigned int getComponentID(const std::string& name)
+  inline unsigned int getComponentID(const std::string& name)
   {
     std::map<std::string, unsigned int>::iterator it = componentIDTable.find(name);
     if(it == componentIDTable.end())
@@ -65,20 +65,32 @@ namespace engine
     /** The data */
     BaseProperty* data;
 
+  public:
+
     /** The component ID */
     unsigned int ID;
 
     /** Create a new component
      * @param d data type
      * @param name component type name (this will add a new id if this name has not been used yet) */
-    template <typename T> Component(const T& d, const std::string& name)
+    Component(BaseProperty* d, const std::string& name)
     {
-      data = new Property<T>(d);
+      data = d;
       ID = getComponentID(name);
+    }
+
+    Component()
+    {
+      data = NULL;
     }
 
     /** Destroy */
     ~Component()
+    {
+    }
+
+    /** Delete the value */
+    inline void destroyValue()
     {
       delete data;
     }
@@ -89,7 +101,7 @@ namespace engine
      * @return data in native type */
     template <typename T> inline T& getData()
     {
-      return ((Property<T>)data)->data;
+      return ((Property<T>*)data)->data;
     }
   };
 

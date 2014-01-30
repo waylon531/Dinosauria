@@ -1,7 +1,7 @@
 *~
 \#*
 *.o
-*bin/dinosauria
+bin/*
 *doc/html
 *doc/latex
 *saves/*
@@ -16,3 +16,4 @@ _CPack_Packages
 install_manifest.txt
 Makefile
 Dinosauria*.zip
+libdinosauria.a

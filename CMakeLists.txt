@@ -1,16 +1,25 @@
 cmake_minimum_required(VERSION 2.8)
 
+set(BUILD_TESTS 1)
+
 project(Dinosauria)
 set(Dinosauria_VERSION_MAJOR 0)
 set(Dinosauria_VERSION_MINOR 2-beta)
 
 set(CMAKE_USE_RELATIVE_PATHS true)
 
-file(GLOB_RECURSE SRC_FILES src/*.cpp)
+include(src_file.cmake)
 
-add_executable(bin/dinosauria ${SRC_FILES})
+add_library(dinosauria STATIC ${SRC_FILES})
+
+add_executable(bin/dinosauria src/dinosauria.cpp)
+target_link_libraries(bin/dinosauria dinosauria)
+
 add_executable(bin/converter converters/converter.cpp)
 add_executable(bin/bconverter converters/bconverter.cpp)
+
+add_executable(bin/test test/test.cpp)
+target_link_libraries(bin/test dinosauria)
 
 include_directories(src external/include)
 
@@ -34,38 +43,31 @@ if(UNIX)
 endif()
 
 #find OpenGL
-find_package(OpenGL)
-if(OPENGL_FOUND)
-	include_directories(${OPENGL_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${OPENGL_LIBRARIES})
-
-endif()
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${OPENGL_LIBRARIES})
 
 #find GLEW
-find_package(GLEW)
-if(GLEW_FOUND)
-	include_directories(${GLEW_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${GLEW_LIBRARIES})
-else()
-	error(GLEW not found)
-endif()
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${GLEW_LIBRARIES})
 
 #find Freetype
-find_package(Freetype)
-if(FREETYPE_FOUND)
-	include_directories(${FREETYPE_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${FREETYPE_LIBRARIES})
-else()
-	error(Freetype not found)
-endif()
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${FREETYPE_LIBRARIES})
 
 #find PNG
-find_package(PNG)
-if(PNG_FOUND)
-	include_directories(${PNG_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${PNG_LIBRARIES})
-else()
-	error(LibPng not found)
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${PNG_LIBRARIES})
+
+#find Boost
+if(BUILD_TESTS)
+	set(BOOST_COMPONENTS unit_test_framework)
+	find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+	include_directories(${Boost_INCLUDE_DIRS})
+	target_link_libraries(bin/test ${Boost_LIBRARIES})
 endif()
 
 target_link_libraries(bin/dinosauria glfw3)
@@ -111,3 +113,6 @@ set(CPACK_PACKAGE_VERSION "${Dinosauria_VERSION_MAJOR}.${Dinosauria_VERSION_MINO
 set(CPACK_PACKAGE_VERSION_MAJOR "${Dinosauria_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR "${Dinosauria_VERSION_MINOR})
 include(CPack)
+
+#unit test run
+add_custom_command(TARGET bin/test POST_BUILD COMMAND bin/test)

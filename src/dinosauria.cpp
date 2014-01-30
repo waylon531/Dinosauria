@@ -1,6 +1,7 @@
 #include "graphics/graphics.hpp"
 #include "gui/gui.hpp"
 #include "game/game.hpp"
+#include "engine/engine.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -434,7 +435,6 @@ void initAllDinos()
 
 int main(int argc, char** argv)
 {
-  //run primary prototype
   context = new graphics::GLContext(REAL_W,REAL_H,"Dinosauria");
   graphics::initAtlas();
   gui::initFonts();

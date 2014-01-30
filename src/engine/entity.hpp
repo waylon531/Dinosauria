@@ -12,7 +12,7 @@ namespace engine
   private:
     
     /** The component list */
-    std::vector<Component*> components;
+    std::vector<Component> components;
 
   public:
 
@@ -25,8 +25,6 @@ namespace engine
     /** Initialize
      * @param name name of the entity */
     Entity(const std::string& name="");
-
-    /** Destroy */
     ~Entity();
 
     /** Add a new component to this entity
@@ -35,8 +33,8 @@ namespace engine
 
     /** Get a component by name
      * @param name name of component
-     * @return component pointer */
-    Component* getComponent(const std::string& name);
+     * @return component */
+    Component getComponent(const std::string& name);
 
   };
 };
