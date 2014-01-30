@@ -1,9 +1,12 @@
 #include "engine/entity.hpp"
 
+std::map<std::string, unsigned int> engine::entitySigTable;
+unsigned int engine::currentEntitySig = 0;
 unsigned int currentEntityID = 0;
 
-engine::Entity::Entity(const std::string& n)
+engine::Entity::Entity(const unsigned int s, const std::string& n)
 {
+  sig  = s;
   name = n;
   id = currentEntityID++;
 }
@@ -21,14 +24,13 @@ void engine::Entity::addComponent(const Component& component)
   components.push_back(component);
 }
 
-engine::Component engine::Entity::getComponent(const std::string& name)
+engine::Component engine::Entity::getComponent(const unsigned int id)
 {
-  unsigned int id = getComponentID(name);
   for(int i=0; i<components.size(); i++)
     {
       if(components[i].ID == id) return components[i];
     }
-  std::cout << "Error: could not find component " << name << " with id " << id << " in this entity." << std::endl;
+  std::cout << "Error: could not find component with id " << id << " in this entity." << std::endl;
   raise(SIGTERM);
   return Component();
 }
