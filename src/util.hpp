@@ -80,7 +80,7 @@ template <typename T> inline T clamp(const T& x, const T& a, const T& b)
  * @return interpolated value */
 template <typename T> inline T lerp(const T& a, const T& b, const float alpha)
 {
-  return alpha*a + (1.f-alpha)*b;
+  return (1.f-alpha)*a + alpha*b;
 }
 
 /** Preform cosine interpolation on a value
@@ -172,3 +172,31 @@ extern void writeFloatFile(const int xres, const int yres, const std::string& fn
  * @param fname file name
  * @return float array */
 extern float* readFloatFile(const int xres, const int yres, const std::string& fname);
+
+/** A general game exception */
+class Exception
+{
+public:
+
+  /** The error message */
+  std::string message;
+
+  /** The line that it was called from */
+  int line;
+  /** The file that it was called from */
+  std::string file;
+
+  /** Initialize
+   * @param msg message
+   * @param l line
+   * @param f file */
+  Exception(const std::string& msg, const int l, const std::string& f) : message(msg), line(l), file(f)
+  {
+  }
+
+  /** Print output to console */
+  void report() const
+  {
+    std::cerr << "Execption (" << file << ":" << line << "), \"" << message << "\"" << std::endl;
+  }
+};

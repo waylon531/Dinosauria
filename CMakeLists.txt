@@ -25,7 +25,7 @@ include_directories(src external/include)
 
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Lexternal/lib")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow -Wno-unused-result -O2 -g")
 
 if(APPLE)
 	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

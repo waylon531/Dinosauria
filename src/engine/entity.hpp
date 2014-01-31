@@ -50,12 +50,16 @@ namespace engine
 
     /** Add a new component to this entity
      * @param component componenet to add */
-    void addComponent(const Component& component);
+    void addComponent(const Component component);
 
-    /** Get a component by name
+    /** Get a component by id
      * @param id id of component
      * @return component */
     Component getComponent(const unsigned int id);
+    inline Component getComponent(const std::string& name)
+    {
+      return getComponent(getComponentID(name));
+    }
 
     /** Add to this signature
      * @param s signature to add */
@@ -77,6 +81,19 @@ namespace engine
     inline bool checkSig(const unsigned int s)
     {
       return (s & sig) == s;
+    }
+
+    inline bool operator==(const Entity& e)
+    {
+      return id == e.id;
+    }
+    inline bool operator==(const unsigned int ID)
+    {
+      return id == ID;
+    }
+    inline bool operator==(const std::string& Name)
+    {
+      return name == Name;
     }
 
   };

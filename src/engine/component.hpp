@@ -63,7 +63,7 @@ namespace engine
   private:
 
     /** The data */
-    BaseProperty* data;
+    std::shared_ptr<BaseProperty> data;
 
   public:
 
@@ -75,24 +75,18 @@ namespace engine
      * @param name component type name (this will add a new id if this name has not been used yet) */
     Component(BaseProperty* d, const std::string& name)
     {
-      data = d;
+      data = std::shared_ptr<BaseProperty>(d);
       ID = getComponentID(name);
     }
 
     Component()
     {
-      data = NULL;
     }
 
     /** Destroy */
     ~Component()
     {
-    }
-
-    /** Delete the value */
-    inline void destroyValue()
-    {
-      delete data;
+      data.reset();
     }
 
     /** Get the data
@@ -101,7 +95,7 @@ namespace engine
      * @return data in native type */
     template <typename T> inline T& getData()
     {
-      return ((Property<T>*)data)->data;
+      return ((Property<T>*)(data.get()))->data;
     }
   };
 

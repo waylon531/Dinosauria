@@ -30,4 +30,5 @@ set(SRC_FILES src/util.cpp
 	      src/game/dinosaur.cpp
 	      src/game/water.cpp
 	      src/engine/entity.cpp
-	      src/engine/component.cpp)
+	      src/engine/component.cpp
+	      src/engine/engine.cpp)

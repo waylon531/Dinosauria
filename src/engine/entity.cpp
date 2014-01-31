@@ -13,13 +13,9 @@ engine::Entity::Entity(const unsigned int s, const std::string& n)
 
 engine::Entity::~Entity()
 {
-  for(int i=0; i<components.size(); i++)
-    {
-      components[i].destroyValue();
-    }
 }
 
-void engine::Entity::addComponent(const Component& component)
+void engine::Entity::addComponent(const Component component)
 {
   components.push_back(component);
 }
@@ -30,7 +26,6 @@ engine::Component engine::Entity::getComponent(const unsigned int id)
     {
       if(components[i].ID == id) return components[i];
     }
-  std::cout << "Error: could not find component with id " << id << " in this entity." << std::endl;
-  raise(SIGTERM);
+  throw Exception("could not find component with id "+asString(id)+" in this entity", __LINE__ , __FILE__);
   return Component();
 }
