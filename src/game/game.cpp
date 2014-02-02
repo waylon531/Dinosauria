@@ -13,7 +13,6 @@ Game::Game()
   world = std::shared_ptr<graphics::World>(new graphics::World(camera));
   sky = std::shared_ptr<graphics::Sky>(new graphics::Sky(glm::vec3(.2f,.2f,.5f)));
   ground = std::shared_ptr<Landscape>(new Landscape);
-  world->addMesh(ground);
   ocean = std::shared_ptr<Ocean>(new Ocean);
   
   fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
@@ -95,6 +94,14 @@ Game::Game()
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
   shader_Cbasic->attachUniform(pass_color->unif);
   comp_basic = MKPTR(graphics::Compositor,shader_Cbasic);
+
+  ecs = MKPTR(engine::EngineManager);
+  ecs->addSystem(new RenderSystem(world));
+
+  engine::Entity groundEntity(engine::getEntitySig("renderable"), "ground");
+  groundEntity.addComponent(engine::Component(new engine::Property<std::shared_ptr<graphics::RenderableObjectExt>>(ground), "rendObject"));
+  ecs->addEntity(groundEntity);
+  ecs->addEntity(engine::Entity(0,"player"));
 }
 
 #include <pugixml.hpp>
@@ -102,14 +109,15 @@ Game::Game()
 
 Game::~Game()
 {
-  camera.reset();
-  world.reset();
-  player.reset();
-  ground.reset();
 }
 
 void Game::load(const std::string& dir, float* value, float* value2, Callback& callback)
 {
+  /*
+  if(player)
+    {
+      ecs->removeEntity("player");
+    }
 #define NUM_TASKS 2
   const float inc = 1.f/NUM_TASKS;
   *value=0.f;
@@ -126,7 +134,6 @@ void Game::load(const std::string& dir, float* value, float* value2, Callback& c
     {
       pugi::xml_node player_node = doc.child("player");
       player = std::shared_ptr<DinosaurInstance>(new DinosaurInstance(player_node));
-      world->addMesh(player);
       pugi::xml_node game_node = doc.child("game");
       time = game_node.attribute("time").as_int();
     }
@@ -137,6 +144,12 @@ void Game::load(const std::string& dir, float* value, float* value2, Callback& c
   *value+=inc;
   callback.call();
 #undef NUM_TASKS
+  engine::Entity pentity(engine::getEntitySig("renderable"), "player");
+  pentity.addComponent(engine::Component(new engine::Property<std::shared_ptr<graphics::RenderableObjectExt>>(player), "rendObject"));
+  pentity.addComponent(engine::Component(new engine::Property<std::shared_ptr<glm::vec3>>(&player.pos), "position"));
+  pentity.addComponent(engine::Component(new engine::Property<std::shared_ptr<glm::vec3>>(&player.zrot), "zrot"));
+  ecs->addEntity(pentity);
+  */
 }
 
 void Game::start(float* value, float* value2, Callback& callback)
@@ -153,12 +166,13 @@ void Game::start(float* value, float* value2, Callback& callback)
 
 glm::vec3 Game::getCameraLoc()
 {
-  return player->pos + glm::vec3(player->matrix * glm::vec4(camScale*CAMERA_POS,0.f));
+  engine::Entity player = ecs->getEntity("player");
+  return player.getComponent("pos").getData<glm::vec3>() + glm::vec3(*(player.getComponent("m_model").getData<std::shared_ptr<glm::mat4>>()) * glm::vec4(camScale*CAMERA_POS,0.f));
 }
 
 void Game::save(const std::string& name)
 {
-  std::string dir = "saves/"+name+"/";
+  /*std::string dir = "saves/"+name+"/";
   mkdir(dir.c_str(),0777);
   pugi::xml_document doc;
   pugi::xml_node node_player = doc.append_child("player");
@@ -167,24 +181,32 @@ void Game::save(const std::string& name)
   node_game.append_attribute("time") = asString(time).c_str();
   doc.save_file((dir+"game.xml").c_str());
 
-  ground->save(dir);
+  ground->save(dir);*/
 }
 
 void Game::setPlayer(std::shared_ptr<Dinosaur> dino)
 {
-  player = std::shared_ptr<DinosaurInstance>(new DinosaurInstance(dino));
-  world->addMesh(player);
-  player->pos = glm::vec3(0.f,0.f,0.f);
+  ecs->removeEntity("player");
+  engine::Entity player(engine::getEntitySig("renderable") | engine::getEntitySig("control"), "player");
+  player.addComponent(engine::Component(new engine::Property<std::shared_ptr<graphics::RenderableObjectExt>>(dino), "rendObject"));
+  player.addComponent(engine::Component(new engine::Property<std::shared_ptr<glm::mat4>>(std::shared_ptr<glm::mat4>(&(dino->m_model))), "m_model"));
+  player.addComponent(engine::Component(new engine::Property<glm::vec3>(glm::vec3(0.f,0.f,0.f)), "pos"));
+  player.addComponent(engine::Component(new engine::Property<glm::vec3>(glm::vec3(0.f,0.f,0.f)), "rot"));
+  player.addComponent(engine::Component(new engine::Property<std::shared_ptr<Dinosaur>>(dino), "parent"));
+  ecs->addEntity(player);
+  //player = std::shared_ptr<DinosaurInstance>(new DinosaurInstance(dino));
+  //player->pos = glm::vec3(0.f,0.f,0.f);
 }
 
 void Game::render()
 {
+  engine::Entity player = ecs->getEntity("player");
 #define ALPHA 0.025f
   glm::vec3 camLoc = getCameraLoc();
   camera->setPos(camera->pos*(1.0f-ALPHA) + camLoc*ALPHA);
   float cmax = ground->eval(camera->pos.x, camera->pos.z) + 2.0;
   if(camera->pos.y <= cmax) camera->setPos(glm::vec3(camera->pos.x, cmax, camera->pos.z));
-  focalLength = glm::distance(camera->pos , player->pos);
+  focalLength = glm::distance(camera->pos , player.getComponent("pos").getData<glm::vec3>());
   *ground->m_tessView = camera->mat_view;
 #undef ALPHA
   time++;
@@ -192,6 +214,8 @@ void Game::render()
   float cosa = cos(angle);
   world->sun = glm::normalize(glm::vec3(cosa*.25f,sin(angle),cosa*.75f));
   //world->sun = glm::normalize(glm::vec3(1.01f,1.01f,1.01f));
+
+  ecs->update();
 
   fbo_reflection->use();
   pass_color_reflection->use();
@@ -284,8 +308,9 @@ void Game::render()
 void Game::resetGame()
 {
   camera->setPos(CAMERA_START);
-  world->removeMesh(player);
-  player.reset();
+  ecs->removeEntity("player");
+  //world->removeMesh(player);
+  //player.reset();
 }
 
 void Game::onMouseOver(const glm::vec2& pos)
@@ -302,21 +327,22 @@ void Game::onMouseRelease(const glm::vec2& pos)
 }
 void Game::onKey(GLFWwindow* window)
 {
+  engine::Entity player = ecs->getEntity("player");
   if(glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-      player->zrot += 1.f;
+      player.getComponent("rot").getData<glm::vec3>().z += 1.f;
     }
   if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-      player->zrot -= 1.f;
+      player.getComponent("rot").getData<glm::vec3>().z -= 1.f;
     }
   if(glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
     {
-      player->pos += glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f));
+      player.getComponent("pos").getData<glm::vec3>() += glm::vec3(*(player.getComponent("m_model").getData<std::shared_ptr<glm::mat4>>()) * glm::vec4(.0f,.0f,player.getComponent("parent").getData<std::shared_ptr<Dinosaur>>()->speed,0.f));
     }
   if(glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-      player->pos -= glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f));
+      player.getComponent("pos").getData<glm::vec3>() -= glm::vec3(*(player.getComponent("m_model").getData<std::shared_ptr<glm::mat4>>()) * glm::vec4(.0f,.0f,player.getComponent("parent").getData<std::shared_ptr<Dinosaur>>()->speed,0.f));
     }
   if(glfwGetKeyOnce(window,GLFW_KEY_Z) == GLFW_PRESS)
     {
@@ -331,6 +357,6 @@ void Game::onKey(GLFWwindow* window)
     {
       camScale /= SCALE_INC;
     }
-  player->update(ground);
-  camera->setLook(player->pos);
+  //player->update(ground);
+  camera->setLook(player.getComponent("pos").getData<glm::vec3>());
 }

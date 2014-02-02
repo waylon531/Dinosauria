@@ -435,34 +435,41 @@ void initAllDinos()
 
 int main(int argc, char** argv)
 {
-  context = new graphics::GLContext(REAL_W,REAL_H,"Dinosauria");
-  graphics::initAtlas();
-  gui::initFonts();
-  initAllDinos();
-  frame_mainmenu = std::shared_ptr<MainMenu>(new MainMenu);
-  frame_mainmenu->render();
-  frame_newgame = std::shared_ptr<NewGameMenu>(new NewGameMenu);
-  frame_game = std::shared_ptr<GameFrame>(new GameFrame);
-  frame_gen = std::shared_ptr<GenFrame>(new GenFrame);
-  frame_load = std::shared_ptr<LoadFrame>(new LoadFrame);
-  current_frame = frame_mainmenu;
-  running = true;
-  while(!context->getEventClose() && running)
+  try
     {
-      context->pollEvents();
-      context->use();
-      current_frame->update(context);
-      current_frame->render();
-      context->flip();
+      context = new graphics::GLContext(REAL_W,REAL_H,"Dinosauria");
+      graphics::initAtlas();
+      gui::initFonts();
+      initAllDinos();
+      frame_mainmenu = std::shared_ptr<MainMenu>(new MainMenu);
+      frame_mainmenu->render();
+      frame_newgame = std::shared_ptr<NewGameMenu>(new NewGameMenu);
+      frame_game = std::shared_ptr<GameFrame>(new GameFrame);
+      frame_gen = std::shared_ptr<GenFrame>(new GenFrame);
+      frame_load = std::shared_ptr<LoadFrame>(new LoadFrame);
+      current_frame = frame_mainmenu;
+      running = true;
+      while(!context->getEventClose() && running)
+	{
+	  context->pollEvents();
+	  context->use();
+	  current_frame->update(context);
+	  current_frame->render();
+	  context->flip();
+	}
+      frame_mainmenu.reset();
+      frame_newgame.reset();
+      frame_game.reset();
+      frame_gen.reset();
+      game.reset();
+      current_frame.reset();
+      graphics::u_ortho.reset();
+      delete context;
     }
-  frame_mainmenu.reset();
-  frame_newgame.reset();
-  frame_game.reset();
-  frame_gen.reset();
-  game.reset();
-  current_frame.reset();
-  graphics::u_ortho.reset();
-  delete context;
-	
+  catch(Exception e)
+    {
+      e.report();
+    }
+  
   return EXIT_SUCCESS;
 }

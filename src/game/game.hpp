@@ -8,13 +8,18 @@
 #include "graphics/sky.hpp"
 #include "graphics/fbo.hpp"
 #include "graphics/post.hpp"
+#include "engine/engine.hpp"
+#include "game/render_system.hpp"
 
 /** A strcture to hold all data needed for a specific game */
 class Game
 {
 private:
 
-  std::shared_ptr<DinosaurInstance> player;
+  std::shared_ptr<engine::EngineManager> ecs;
+  
+  //std::shared_ptr<DinosaurInstance> player;
+  //std::shared_ptr<engine::Entity> player;
   std::shared_ptr<graphics::Sky> sky;
 
   std::shared_ptr<graphics::World> world;

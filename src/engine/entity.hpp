@@ -60,6 +60,11 @@ namespace engine
     {
       return getComponent(getComponentID(name));
     }
+    bool hasComponent(const unsigned int id);
+    inline bool hasComponent(const std::string& name)
+    {
+      return hasComponent(getComponentID(name));
+    }
 
     /** Add to this signature
      * @param s signature to add */

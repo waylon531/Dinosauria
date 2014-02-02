@@ -29,3 +29,12 @@ engine::Component engine::Entity::getComponent(const unsigned int id)
   throw Exception("could not find component with id "+asString(id)+" in this entity", __LINE__ , __FILE__);
   return Component();
 }
+
+bool engine::Entity::hasComponent(const unsigned int id)
+{
+  for(int i=0; i<components.size(); i++)
+    {
+      if(components[i].ID == id) true;
+    }
+  return false;
+}

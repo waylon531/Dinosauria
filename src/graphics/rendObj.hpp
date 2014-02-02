@@ -26,6 +26,8 @@ namespace graphics
   {
   public:
 
+    glm::mat4 m_model;
+
     /** Render a shadow pass */
     virtual void renderShadowPass() {render();}
 

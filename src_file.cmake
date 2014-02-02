@@ -29,6 +29,7 @@ set(SRC_FILES src/util.cpp
 	      src/game/game.cpp
 	      src/game/dinosaur.cpp
 	      src/game/water.cpp
+	      src/game/render_system.cpp
 	      src/engine/entity.cpp
 	      src/engine/component.cpp
 	      src/engine/engine.cpp)

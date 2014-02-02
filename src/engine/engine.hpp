@@ -62,6 +62,22 @@ namespace engine
       raise(SIGTERM);
     }
 
+    /** Get an entity by name
+     * @param name name of entity to get
+     * @return entity */
+    inline Entity getEntity(const std::string& name)
+    {
+      for(int i=0; i<entities.size(); i++)
+	{
+	  if(entities[i].name == name)
+	    {
+	      return entities[i];
+	    }
+	}
+      throw Exception("Entity with name "+name+" not found in this engine", __LINE__,__FILE__);
+      return Entity(0);
+    }
+      
     /** Add a new System
      * @param system system to add */
     inline void addSystem(System* s)

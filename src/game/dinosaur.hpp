@@ -7,7 +7,7 @@
 #include "game/landscape.hpp"
 
 /** A dinosaur structure */
-class Dinosaur: public graphics::RenderableObject
+class Dinosaur: public graphics::RenderableObjectExt
 {
 public:
   /** The dinosaur's mesh */
@@ -32,6 +32,20 @@ public:
   ~Dinosaur();
 
   void render();
+
+  void setMatrixView(glm::mat4* view)
+  {
+    mesh->setMatrixView(view);
+  }
+  void setMatrixProject(glm::mat4* project)
+  {
+    mesh->setMatrixProject(project);
+  }
+  void setWaterFlag(int* wflag)
+  {
+    mesh->setWaterFlag(wflag);
+  }
+
 };
 
 /** A list of all the dinosaurs */
@@ -40,6 +54,7 @@ extern std::vector<std::shared_ptr<Dinosaur>> dinosaurs;
 /** Get a dinosaur by it's name
  * @param name name of the dinosaur to fetch */
 extern std::shared_ptr<Dinosaur> getDinosaur(const std::string& name);
+
 
 /** A single instance of a dinosaur in the game */
 class DinosaurInstance : public graphics::RenderableObjectExt
@@ -56,7 +71,7 @@ public:
   float zrot;
 
   /** The model matrix */
-  glm::mat4 matrix;
+  //glm::mat4 matrix;
 
   /** The current clock */
   float time;

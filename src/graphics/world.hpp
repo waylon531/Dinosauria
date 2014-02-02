@@ -63,6 +63,13 @@ namespace graphics
      * @param mesh mesh to add */
     void addMesh(std::shared_ptr<RenderableObjectExt> mesh);
 
+    /** Set the entire list of meshs
+     * @param list list of meshs */
+    inline void setMeshList(std::vector<std::shared_ptr<RenderableObjectExt>> list)
+    {
+      meshs = list;
+    }
+
     /** Remove a mesh from the world
      * @param mesh mesh to remove */
     void removeMesh(std::shared_ptr<RenderableObjectExt> mesh);

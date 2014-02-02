@@ -65,7 +65,7 @@ DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
 DinosaurInstance::~DinosaurInstance()
 {
   parent.reset();
-  matrix = glm::mat4();
+  m_model = glm::mat4();
 }
 
 void DinosaurInstance::save(pugi::xml_node& node)
@@ -78,7 +78,7 @@ void DinosaurInstance::save(pugi::xml_node& node)
 void DinosaurInstance::update(std::shared_ptr<Landscape> ground)
 {
   pos.y = ground->eval(pos.x,pos.z);
-  matrix = glm::translate(pos) * glm::rotate(zrot,0.f,1.f,0.f);
+  m_model = glm::translate(pos) * glm::rotate(zrot,0.f,1.f,0.f);
 }
 
 void DinosaurInstance::setMatrixView(glm::mat4* view)
@@ -94,6 +94,6 @@ void DinosaurInstance::render()
   time += 0.01;
   if(time > 20.0) time = 0.0;
   parent->mesh->setTime(time);
-  parent->mesh->m_model = matrix;
+  parent->mesh->m_model = m_model;
   parent->render();
 }
