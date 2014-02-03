@@ -83,7 +83,7 @@ void graphics::World::render()
       b_shadow[b]->use();
       glClear(GL_DEPTH_BUFFER_BIT);
       //m_lightView = camera->mat_view;
-      #define TMP 10
+      #define TMP 5
       #define Z_TMP 20
       glm::mat4 m_lightProject = glm::ortho<float>(-TMP*scale,TMP*scale,-TMP*scale,TMP*scale,-Z_TMP,Z_TMP);//glm::mat4(1.0);//glm::ortho<float>(0.0, SHADOW_W, 1.0, SHADOW_H);
       m_light[0] = m_lightProject * m_lightView;
