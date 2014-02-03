@@ -1,8 +1,0 @@
-<!DOCTYPE xml>
-
-<dinosaur name="Blockasaurus"
-	  speed=".1">
-  <description> The blockasaurus is what happens when a remesh modifier on block mode is applied to a set of metaballs that vaguely resemble a creature. It never existed in real life and is purely used because I am not very good at 3D modeling and don't have any dinosaur models. </description>
-  <mesh>res/models/blockasaurus.obj</mesh>
-  <material>res/materials/blockasaurus.mat</material>
-</dinosaur>

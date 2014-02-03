@@ -1,4 +1,0 @@
-vert res/shaders/t1.vert
-frag res/shaders/t1.frag
-link
-tex res/textures/bricks.png tex_bricks

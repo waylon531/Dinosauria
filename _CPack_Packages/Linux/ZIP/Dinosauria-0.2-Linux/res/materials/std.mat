@@ -1,3 +1,0 @@
-vert res/shaders/std.vert
-frag res/shaders/std.frag
-link

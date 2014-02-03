@@ -1,6 +1,0 @@
-vert res/shaders/ground_shadow.vert
-eval res/shaders/ground_shadow.eval
-ctrl res/shaders/ground_shadow.ctrl
-geom res/shaders/ground_shadow.geom
-frag res/shaders/ground_shadow.frag
-link
