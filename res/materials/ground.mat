@@ -6,3 +6,4 @@ frag res/shaders/ground.frag
 link
 tex res/textures/dirt.png tex_dirt
 tex res/textures/rock.png tex_rock
+tex res/textures/micronormal.png tex_micronormal

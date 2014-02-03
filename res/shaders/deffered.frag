@@ -82,7 +82,7 @@ float occluded(vec3 normal)
   //UV.y = 0.5 * coords.y + 0.5;
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
-  float bias = clamp(0.01*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
+  float bias = clamp(0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
   float depthS = texture2D(tex_shadow[b], UV).x;
   if(depthS < (depth - bias)) return 0.0;
   return 1.0;
@@ -110,5 +110,5 @@ void main()
   position = texture2D(tex_position, vTexCoord.st).xyz;
   depth = toDepth(texture2D(tex_depth, vTexCoord.st).r);
   fColor = vec4(computeLighting(color, normal),1.f);
-  //fColor = vec4(params, 1.f);
+  //fColor = vec4(normal, 1.f);
 }

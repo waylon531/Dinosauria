@@ -39,6 +39,11 @@ void Landscape::initMesh(float* value, Callback& callback)
   material->addTexture(tex_b);
   tex_normal = std::shared_ptr<graphics::GLTexture2D>(new graphics::GLTexture2D(nmap, RES,RES, "tex_normal", GL_RGBA,GL_RGB));
   material->addTexture(tex_normal);
+  std::shared_ptr<graphics::GLTexture2D> tex_tangent(new graphics::GLTexture2D(tmap, RES,RES, "tex_tangent", GL_RGBA,GL_RGB));
+  material->addTexture(tex_tangent);
+  std::shared_ptr<graphics::GLTexture2D> tex_bitangent(new graphics::GLTexture2D(bmap, RES,RES, "tex_bitangent", GL_RGBA,GL_RGB));
+  material->addTexture(tex_bitangent);
+  
   material_shadow->addTexture(tex_normal);
   for(int xx=0; xx<INIT_RES; xx++)
     {

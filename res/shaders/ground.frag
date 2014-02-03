@@ -3,6 +3,9 @@
 #define N_SHADOW_BUFFERS 4
 uniform sampler2D tex_height;
 uniform sampler2D tex_normal;
+uniform sampler2D tex_tangent;
+uniform sampler2D tex_bitangent;
+uniform sampler2D tex_micronormal;
 uniform sampler2D tex_blend;
 uniform sampler2D tex_dirt;
 uniform sampler2D tex_rock;
@@ -44,8 +47,14 @@ void main()
 	  discard;
 	}
     }
-      
+
+  vec3 micro = mix( vec3(0.f,1.f,0.f), normalize(texture2D(tex_micronormal, gPosition.xz).rgb), 0.1);
   vec3 normal = texture2D(tex_normal, gTexCoord.st).rgb;
+  vec3 tangent = texture2D(tex_tangent, gTexCoord.st).rgb;
+  vec3 bitangent = texture2D(tex_bitangent, gTexCoord.st).rgb;
+  //vec3 tangent = normalize(cross(normal, vec3(0,1,0)));
+  //vec3 bitangent = normalize(cross(tangent, normal));
+  normal = normalize(micro.x * tangent + micro.y * normal + micro.z * bitangent);
   fNormal = vec4(normal,1.f);
   vec3 dirt = texture2D(tex_dirt, gPosition.xz*.1f).rgb;
   vec3 rock = clamp(texture2D(tex_rock, gPosition.xz*.2f).rgb,0.0,1.0);

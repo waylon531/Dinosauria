@@ -13,7 +13,7 @@ glm::vec3 triangleNormal(const float p00, const float p01, const float p10, cons
   glm::vec3 n(-s0.y,s,-s1.y);
   n = glm::normalize(n);
   if(n.y<0.f) n *= -1.f;
-  n = glm::vec3(n.x,n.z,n.y);
+  n = glm::vec3(n.x,n.y,n.z);
   return n;
 }
 
@@ -25,7 +25,7 @@ void computeGradient(float* a, const int xres, const int yres, glm::vec3* tangen
       for(int y=0; y<yres; y++)
 	{
 	  
-	  const float s = 1.f/xres ;
+	  const float s = 500.f/xres;
 	  glm::vec3 tangent(s,a[clamp(x+1,0,xres-1)*xres+y]-a[x*xres+y] ,0.f);
 	  glm::vec3 bitangent(0.f,a[x*xres+clamp(y+1,0,yres-1)]-a[x*xres+y] ,s);
 	  normals[x*xres+y] = glm::vec3(0.f,0.f,0.f);
