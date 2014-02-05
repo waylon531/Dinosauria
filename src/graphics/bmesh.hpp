@@ -74,7 +74,7 @@ namespace graphics
       }
     };
     
-  private:
+  public:
 
     /** The vertex array */
     attrib* verts;
@@ -82,6 +82,11 @@ namespace graphics
     /** The index array */
     GLuint* inds;
 
+    /** The number of vertices */
+    int nverts;
+
+  private:
+    
     /** The bone array */
     std::vector<Bone> bones;
     Action anim;

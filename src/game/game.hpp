@@ -8,6 +8,7 @@
 #include "graphics/sky.hpp"
 #include "graphics/fbo.hpp"
 #include "graphics/post.hpp"
+#include "physics/physics.hpp"
 
 /** A strcture to hold all data needed for a specific game */
 class Game
@@ -18,6 +19,7 @@ private:
   std::shared_ptr<graphics::Sky> sky;
 
   std::shared_ptr<graphics::World> world;
+  std::shared_ptr<physics::World> physicsWorld;
 
   std::shared_ptr<graphics::Camera> camera;
 
@@ -71,6 +73,9 @@ private:
   float camScale;
 
   int time;
+
+  /** Whether the game is drawn in bullet debug mode or not */
+  bool debugMode;
 
 public:
 

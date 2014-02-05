@@ -74,6 +74,8 @@ graphics::SkeletalMesh::SkeletalMesh(const std::string& fname, std::shared_ptr<M
   m_model = glm::mat4();
   initShadow();
 
+  nverts = nv;
+
   for(int i=0; i<nBones; i++)
     {
       std::shared_ptr<GLSLUniform> unif(new GLSLUniform("boneTransforms["+asString(i)+"]", &bones[i].offset));

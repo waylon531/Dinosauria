@@ -70,7 +70,8 @@ void main()
     {
       float d = min(min(gPatchDist.x, gPatchDist.y), gPatchDist.z);
       float a = 1.0-amplify(d, 40, 0.0);
-      fColor.rgb += vec3(step(0.5,a),0.f,0.f);
+      float v = step(0.5,a);
+      fColor.rgb += vec3(v,0.f,0.f);
     }
   fParams = vec4(.6,.0,1.,1.);
   fPosition = vec4(gPosition,1.f);

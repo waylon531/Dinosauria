@@ -51,6 +51,7 @@ void Dinosaur::render()
 
 DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), zrot(0.f)
 {
+  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos));
   time = 0;
 }
 
@@ -60,6 +61,7 @@ DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
   parent = getDinosaur(node.attribute("name").value());
   pos = parseVec3(node.attribute("pos").value());
   zrot = node.attribute("rot").as_float();
+  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos));
 }
 
 DinosaurInstance::~DinosaurInstance()
@@ -77,7 +79,9 @@ void DinosaurInstance::save(pugi::xml_node& node)
 
 void DinosaurInstance::update(std::shared_ptr<Landscape> ground)
 {
-  pos.y = ground->eval(pos.x,pos.z);
+  pos = body->getPosition();
+  pos.y -= .25;
+  //pos.y = ground->eval(pos.x,pos.z);
   matrix = glm::translate(pos) * glm::rotate(zrot,0.f,1.f,0.f);
 }
 
