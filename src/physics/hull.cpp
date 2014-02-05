@@ -6,21 +6,42 @@ physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::Mesh> mesh, const glm:
 
 physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::SkeletalMesh> mesh, const glm::vec3& pos)
 {
-  shape = new btSphereShape(.5);
   //shape = new btConvexHullShape;
-  //for(int i=0; i<mesh->nverts; i++)
-  //  {
+  float maxX = 0.f;
+  float maxY = 0.f;
+  float maxZ = 0.f;
+  float minX = 0.f;
+  float minY = 0.f;
+  float minZ = 0.f;
+  
+  for(int i=0; i<mesh->nverts; i++)
+    {
       //std::cout << "Vertex " << i << " out of " << mesh->nverts << "\r";
-  //    ((btConvexHullShape*)shape)->addPoint(btVector3(mesh->verts[i].pos.x, mesh->verts[i].pos.y, mesh->verts[i].pos.z));
-  //  }
-  btDefaultMotionState* fallMotionState =
-    new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(pos.x,pos.y,pos.z)));
-  btScalar mass = .5;
-  btVector3 fallInertia(0,0,0);
-  //shape->calculateLocalInertia(mass,fallInertia);
-  btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass,fallMotionState,shape,fallInertia);
-  body = new btRigidBody(fallRigidBodyCI);
-  body->setDamping(0.8,.8);
+      maxX = max(maxX, mesh->verts[i].pos.x);
+      maxY = max(maxY, mesh->verts[i].pos.y);
+      maxZ = max(maxZ, mesh->verts[i].pos.z);
+      
+      minX = min(minX, mesh->verts[i].pos.x);
+      minY = min(minY, mesh->verts[i].pos.y);
+      minZ = min(minZ, mesh->verts[i].pos.z);
+  }
+  float maxAxis = max(max(maxX-minX, maxY-minY), maxZ-minZ);
+  if(maxAxis == maxX-minX)
+    {
+      shape = new btCapsuleShapeX(max((maxY-minY),(maxZ-minZ)), (maxX-minX));
+      offset = max((maxY-minY),(maxZ-minZ));
+    }
+  if(maxAxis == maxY-minY)
+    {
+      shape = new btCapsuleShape(max((maxX-minX),(maxZ-minZ)), (maxY-minY));
+      offset = (maxY-minY);
+    }
+  if(maxAxis == maxZ-minZ)
+    {
+      shape = new btCapsuleShapeZ(max((maxY-minY),(maxX-minX)), (maxZ-minZ));
+      offset = max((maxY-minY),(maxX-minX));
+    }
+  initialize(pos);
 }
 
 physics::ConvexHull::~ConvexHull()

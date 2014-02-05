@@ -12,6 +12,9 @@ namespace physics
   {
   public:
 
+    /** The height of the capsule */
+    float offset;
+
     /** Initialize from a static mesh
      * @param mesh mesh to use
      * @param pos position to initialize in */

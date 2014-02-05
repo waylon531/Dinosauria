@@ -18,7 +18,10 @@ namespace physics
 
   public:
 
-    btDiscreteDynamicsWorld* world;
+    btDynamicsWorld* world;
+
+    /** The body list */
+    std::vector<std::shared_ptr<RigidBody>> bodies;
 
     /** Initialize */
     World();

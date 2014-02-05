@@ -80,7 +80,8 @@ void DinosaurInstance::save(pugi::xml_node& node)
 void DinosaurInstance::update(std::shared_ptr<Landscape> ground)
 {
   pos = body->getPosition();
-  pos.y -= .25;
+  pos.y -= ((physics::ConvexHull*)body.get())->offset/2;
+  body->setYRot(zrot);
   //pos.y = ground->eval(pos.x,pos.z);
   matrix = glm::translate(pos) * glm::rotate(zrot,0.f,1.f,0.f);
 }

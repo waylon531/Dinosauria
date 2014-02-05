@@ -188,6 +188,11 @@ void Game::setPlayer(std::shared_ptr<Dinosaur> dino)
 void Game::render()
 {
   physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
   
 #define ALPHA 0.025f
   glm::vec3 camLoc = getCameraLoc();

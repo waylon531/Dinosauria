@@ -36,5 +36,5 @@ physics::Heightfield::Heightfield(float* hmap, const int xres, const int yres, c
   btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0,fallMotionState,shape,btVector3(0,0,0));
   body = new btRigidBody(fallRigidBodyCI);
   //body->setDamping(.98, .95);
-  body->setRestitution(.9);
+  //body->setRestitution(.9);
 }
