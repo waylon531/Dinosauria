@@ -49,9 +49,10 @@ void Dinosaur::render()
   mesh->render();
 }
 
-DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), zrot(0.f)
+DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), rot(0.f,0.f,0.f)
 {
-  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos));
+  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
+  body->body->setDamping(.8,.8);
   time = 0;
 }
 
@@ -60,8 +61,10 @@ DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
   time = 0;
   parent = getDinosaur(node.attribute("name").value());
   pos = parseVec3(node.attribute("pos").value());
-  zrot = node.attribute("rot").as_float();
-  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos));
+  rot = glm::vec3(0.f,0.f,0.f);
+  rot.y = node.attribute("rot").as_float();
+  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
+  body->body->setDamping(.8,.8);
 }
 
 DinosaurInstance::~DinosaurInstance()
@@ -74,16 +77,16 @@ void DinosaurInstance::save(pugi::xml_node& node)
 {
   node.append_attribute("name") = parent->name.c_str();
   node.append_attribute("pos") = (asString(pos.x)+" "+asString(pos.y)+" "+asString(pos.z)).c_str();
-  node.append_attribute("rot") = (asString(zrot)).c_str();
+  node.append_attribute("rot") = (asString(rot.y)).c_str();
 }
 
 void DinosaurInstance::update(std::shared_ptr<Landscape> ground)
 {
   pos = body->getPosition();
   pos.y -= ((physics::ConvexHull*)body.get())->offset/2;
-  body->setYRot(zrot);
+  body->setRotation(deg2rad(rot));
   //pos.y = ground->eval(pos.x,pos.z);
-  matrix = glm::translate(pos) * glm::rotate(zrot,0.f,1.f,0.f);
+  matrix = glm::translate(pos) * glm::rotate(rot.y,0.f,1.f,0.f);
 }
 
 void DinosaurInstance::setMatrixView(glm::mat4* view)

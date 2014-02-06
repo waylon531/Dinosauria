@@ -57,7 +57,7 @@ public:
   glm::vec3 pos;
 
   /** The z rotation of the dinosaur */
-  float zrot;
+  glm::vec3 rot;
 
   /** The model matrix */
   glm::mat4 matrix;

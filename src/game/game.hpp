@@ -4,6 +4,7 @@
 #include "game/dinosaur.hpp"
 #include "game/landscape.hpp"
 #include "game/water.hpp"
+#include "game/rock.hpp"
 #include "graphics/world.hpp"
 #include "graphics/sky.hpp"
 #include "graphics/fbo.hpp"
@@ -25,6 +26,7 @@ private:
 
   std::shared_ptr<Landscape> ground;
   std::shared_ptr<Ocean> ocean;
+  std::vector<std::shared_ptr<Rock>> rocks;
 
   std::shared_ptr<graphics::GLFrameBuffer> fbo;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_reflection;

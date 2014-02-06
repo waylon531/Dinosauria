@@ -3,6 +3,8 @@
 #define CAMERA_POS glm::vec3(0.f,4.f,-5.f)
 #define CAMERA_START glm::vec3(0.f,30.f,0.f)
 
+#define NUM_ROCKS 64
+
 Game::Game()
 {
   graphics::u_time = std::shared_ptr<graphics::GLSLUniform>(new graphics::GLSLUniform("t",&time));
@@ -16,6 +18,8 @@ Game::Game()
   ground = std::shared_ptr<Landscape>(new Landscape);
   world->addMesh(ground);
   ocean = std::shared_ptr<Ocean>(new Ocean);
+
+  init_rocks();
 
   physicsWorld = std::shared_ptr<physics::World>(new physics::World);
   physicsWorld->world->setDebugDrawer(new physics::DebugDraw);
@@ -135,11 +139,21 @@ void Game::load(const std::string& dir, float* value, float* value2, Callback& c
       pugi::xml_node game_node = doc.child("game");
       time = game_node.attribute("time").as_int();
     }
+
   *value+=inc;
   callback.call();
   ground->reset();
   ground->loadMap(dir, value2,callback);
   physicsWorld->addBody(ground->body);
+
+  for(int i=0; i<NUM_ROCKS; i++)
+    {
+      std::shared_ptr<Rock> rock(new Rock(ground));
+      world->addMesh(rock);
+      physicsWorld->addBody(rock->body);
+      rocks.push_back(rock);
+    }
+  
   *value+=inc;
   callback.call();
 #undef NUM_TASKS
@@ -153,6 +167,13 @@ void Game::start(float* value, float* value2, Callback& callback)
   *value=0.f;
   ground->reset();
   ground->generate(value2, callback);
+  for(int i=0; i<NUM_ROCKS; i++)
+    {
+      std::shared_ptr<Rock> rock(new Rock(ground));
+      world->addMesh(rock);
+      physicsWorld->addBody(rock->body);
+      rocks.push_back(rock);
+    }
   physicsWorld->addBody(ground->body);
   *value+=inc;
 #undef NUM_TASKS
@@ -337,11 +358,11 @@ void Game::onKey(GLFWwindow* window)
 #define ROT_INC 5.f
   if(glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-      player->zrot += ROT_INC;
+      player->rot.y += ROT_INC;
     }
   if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-      player->zrot -= ROT_INC;
+      player->rot.y -= ROT_INC;
     }
   if(glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
     {

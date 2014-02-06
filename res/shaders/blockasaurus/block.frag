@@ -17,7 +17,7 @@ layout (location=3) in vec4 vPositionView;
 layout (location=0) out vec4 fColor;
 layout (location=1) out vec4 fNormal;
 layout (location=2) out vec4 fPosition;
-layout (location=4) out vec4 fParams;
+layout (location=3) out vec4 fParams;
 
 void main()
 {

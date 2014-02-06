@@ -23,10 +23,10 @@ void main()
 		       0,0,1,0,
 		       0,0,0,1);
   vec4 boneWeights2 = normalize(boneWeights);
-  if(boneWeights[0]!=0.f) m_model2 += (boneTransforms[boneIds[0]] * boneWeights2[0]);
-  if(boneWeights[1]!=0.f) m_model2 += (boneTransforms[boneIds[1]] * boneWeights2[1]);
-  if(boneWeights[2]!=0.f) m_model2 += (boneTransforms[boneIds[2]] * boneWeights2[2]);
-  if(boneWeights[3]!=0.f) m_model2 += (boneTransforms[boneIds[3]] * boneWeights2[3]);
+  //if(boneWeights[0]!=0.f) m_model2 += (boneTransforms[boneIds[0]] * boneWeights2[0]);
+  //if(boneWeights[1]!=0.f) m_model2 += (boneTransforms[boneIds[1]] * boneWeights2[1]);
+  //if(boneWeights[2]!=0.f) m_model2 += (boneTransforms[boneIds[2]] * boneWeights2[2]);
+  //if(boneWeights[3]!=0.f) m_model2 += (boneTransforms[boneIds[3]] * boneWeights2[3]);
   vec3 position2 = (m_model2 * vec4(position,1.f)).xyz;
   mat4 PVM = m_project*m_view*m_model;
   gl_Position = PVM*vec4(position2,1.f);

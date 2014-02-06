@@ -75,7 +75,7 @@ float occluded(vec3 normal)
       coords = lightSpace / lightSpace.w;
       UV = coords.xy;
       if(!(UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) break;
-      scale *= 2.0;
+      scale *= 5.0;
     }
   if((UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) return 1.0;
   //UV.x = 0.5 * coords.x + 0.5;
@@ -84,7 +84,7 @@ float occluded(vec3 normal)
   float depth = coords.z;
   float bias = clamp(0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
   float depthS = texture2D(tex_shadow[b], UV).x;
-  if(depthS < (depth - bias)) return 0.0;
+  if(depthS < (depth - bias)) return 0.;
   return 1.0;
 }
 

@@ -100,7 +100,7 @@ void graphics::World::render()
 	}
       m_light2[b] = m_bias * m_light[0];
       b_shadow[b]->unuse();
-      scale *= 2.f;
+      scale *= 5.f;
     }
   //color pass
   for(int b=0; b<N_SHADOW_BUFFERS; b++)

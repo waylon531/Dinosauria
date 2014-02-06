@@ -21,8 +21,9 @@ namespace physics
     ~RigidBody();
 
     /** Initialize the body from a shape
-     * @param pos position of body */
-    void initialize(const glm::vec3& pos);
+     * @param pos position of body
+     * @param mass mass of body */
+    void initialize(const glm::vec3& pos, const float mass);
 
     /** Get the position in world space
      * @return world space position */
@@ -32,6 +33,22 @@ namespace physics
       body->getMotionState()->getWorldTransform(trans);
       btVector3 pos = trans.getOrigin();
       return glm::vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    /** Get euler angle rotation
+     * @return rotation of object as euler angle */
+    inline glm::vec3 getRotation() const
+    {
+      btTransform trans;
+      body->getMotionState()->getWorldTransform(trans);
+      btQuaternion quat = trans.getRotation();
+      float w=quat.getW(); float x=quat.getX(); float y=quat.getY(); float z=quat.getZ();
+      double sqw = w*w; double sqx = x*x; double sqy = y*y; double sqz = z*z;
+      glm::vec3 euler;
+      euler.z = ((atan2(2.0 * (x*y + z*w),(sqx - sqy - sqz + sqw))));
+      euler.x = ((atan2(2.0 * (y*z + x*w),(-sqx - sqy + sqz + sqw))));
+      euler.y = ((asin(-2.0 * (x*z - y*w))));
+      return euler;
     }
 
     /** Set the rotation as an euler angle

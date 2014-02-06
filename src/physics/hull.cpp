@@ -1,10 +1,10 @@
 #include "physics/hull.hpp"
 
-physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::Mesh> mesh, const glm::vec3& pos)
+physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::Mesh> mesh, const glm::vec3& pos, const float mass)
 {
 }
 
-physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::SkeletalMesh> mesh, const glm::vec3& pos)
+physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::SkeletalMesh> mesh, const glm::vec3& pos, const float mass)
 {
   //shape = new btConvexHullShape;
   float maxX = 0.f;
@@ -28,20 +28,20 @@ physics::ConvexHull::ConvexHull(std::shared_ptr<graphics::SkeletalMesh> mesh, co
   float maxAxis = max(max(maxX-minX, maxY-minY), maxZ-minZ);
   if(maxAxis == maxX-minX)
     {
-      shape = new btCapsuleShapeX(max((maxY-minY),(maxZ-minZ)), (maxX-minX));
+      shape = new btCapsuleShapeX(max((maxY-minY),(maxZ-minZ))/2, (maxX-minX));
       offset = max((maxY-minY),(maxZ-minZ));
     }
   if(maxAxis == maxY-minY)
     {
-      shape = new btCapsuleShape(max((maxX-minX),(maxZ-minZ)), (maxY-minY));
+      shape = new btCapsuleShape(max((maxX-minX),(maxZ-minZ))/2, (maxY-minY));
       offset = (maxY-minY);
     }
   if(maxAxis == maxZ-minZ)
     {
-      shape = new btCapsuleShapeZ(max((maxY-minY),(maxX-minX)), (maxZ-minZ));
+      shape = new btCapsuleShapeZ(max((maxY-minY),(maxX-minX))/2, (maxZ-minZ));
       offset = max((maxY-minY),(maxX-minX));
     }
-  initialize(pos);
+  initialize(pos, mass);
 }
 
 physics::ConvexHull::~ConvexHull()

@@ -159,6 +159,22 @@ glm::vec3 tmp;
   return tmp;
 }
 
+/** Convert a float from degrees to radians
+ * @param x float
+ * @return x in radians */
+inline float deg2rad(const float x)
+{
+  return x * M_PI/180.f;
+}
+
+/** Convert a vector from degrees to radians
+ * @param x float vector
+ * @return x in radians */
+inline glm::vec3 deg2rad(const glm::vec3& x)
+{
+  return glm::vec3(deg2rad(x.x), deg2rad(x.y), deg2rad(x.z));
+}
+
 /** Write a 2D array of floats to a file
  * @param xres x resolution
  * @param yres y resolution
