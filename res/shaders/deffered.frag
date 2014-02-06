@@ -1,6 +1,6 @@
 #version 410
 
-#define N_SHADOW_BUFFERS 4
+#define N_SHADOW_BUFFERS 5
 
 uniform sampler2D tex_color;
 uniform sampler2D tex_normal;
@@ -12,6 +12,7 @@ uniform mat4 m_project;
 uniform vec3 sunDir,eyeDir;
 uniform sampler2D tex_shadow[N_SHADOW_BUFFERS];
 uniform mat4 m_light[N_SHADOW_BUFFERS];
+uniform int passNum;
 
 in vec2 vTexCoord;
 out vec4 fColor;
@@ -32,7 +33,7 @@ float rand(vec2 n)
   return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-#define AO_RAD 0.006
+#define AO_RAD 0.01
 #define AO_SAMPLES 10
 #define AO_FALLOFF .000002
 #define AO_STRENGTH 0.07
@@ -45,19 +46,20 @@ float getSSAO(vec3 normal)
   float occDepth, depthDiff;
   vec3 ray;
   vec3 occNorm;
+  vec3 sNormal = (m_project * vec4(normal,0.f)).xyz;
   for(int i=0; i<AO_SAMPLES;++i)
     {
       ray = radD * reflect(pSphere[i], fres);
-      vec2 coord = vTexCoord.st + sign(dot(ray,normal))*ray.xy;
+      vec2 coord = vTexCoord.st + /*sign(dot(ray,sNormal))**/ray.xy;
       occDepth = toDepth(texture2D(tex_depth, coord).r);
       occNorm = texture2D(tex_normal, coord).xyz;
       depthDiff = depth - occDepth;
       if(depthDiff>0.0)
 	{
-	  bl += max(0.0,step(AO_FALLOFF, depthDiff) /** (1.0-dot(occNorm,normal)) */* (1.0-smoothstep(AO_FALLOFF,AO_STRENGTH,depthDiff)));
+	  bl += max(0.0,step(AO_FALLOFF, depthDiff) * (1.0-dot(occNorm,normal)) * (1.0-smoothstep(AO_FALLOFF,AO_STRENGTH,depthDiff)));
 	}
     }
-  return 1.0 - bl/10.0;
+  return 1.0 - bl/2.0;
 }
 
 
@@ -75,21 +77,21 @@ float occluded(vec3 normal)
       coords = lightSpace / lightSpace.w;
       UV = coords.xy;
       if(!(UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) break;
-      scale *= 5.0;
+      scale *= 4.0;
     }
   if((UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) return 1.0;
   //UV.x = 0.5 * coords.x + 0.5;
   //UV.y = 0.5 * coords.y + 0.5;
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
-  float bias = clamp(0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.01);
+  float bias = clamp(scale*0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.05);
   float depthS = texture2D(tex_shadow[b], UV).x;
   if(depthS < (depth - bias)) return 0.;
   return 1.0;
 }
 
 #define AMBIENT .0
-#define AO .3
+#define AO .4
 vec3 computeLighting(vec3 base, vec3 normal)
 {
   float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);
@@ -109,6 +111,24 @@ void main()
   params = texture2D(tex_params, vTexCoord.st).xyz;
   position = texture2D(tex_position, vTexCoord.st).xyz;
   depth = toDepth(texture2D(tex_depth, vTexCoord.st).r);
-  fColor = vec4(computeLighting(color, normal),1.f);
-  //fColor = vec4(normal, 1.f);
+  if(passNum==0)
+    {
+      fColor = vec4(computeLighting(color, normal),1.f);
+    }
+  if(passNum==1)
+    {
+      fColor = vec4(normal, 1.f);
+    }
+  if(passNum==2)
+    {
+      fColor = vec4(vec3(1.f/(depth*5.f)),1.f);
+    }
+  if(passNum==3)
+    {
+      fColor = vec4(vec3(getSSAO(normal)),1.f);
+    }
+  if(passNum==4)
+    {
+      fColor = vec4(vec3(occluded(normal)),1.f);
+    }
 }

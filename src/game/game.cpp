@@ -39,7 +39,7 @@ Game::Game()
   shader_Cwater->attachUniform(pass_color->unif);
   shader_Cwater->attachUniform(fbo_reflection->unif_depth);
   shader_Cwater->attachUniform(pass_color_reflection->unif);
-  shader_Cwater->attachUniform(world->fbo->unif_depth);
+  shader_Cwater->attachUniform(world->mfbo->unif_depth);
   shader_Cwater->attachUniform(ocean->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
@@ -57,8 +57,8 @@ Game::Game()
 #define BLOOM_W (W/4)
 #define BLOOM_H (H/4)
   fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
-  fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
+  fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
   pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
   pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
   pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom",GL_RGBA32F,GL_HALF_FLOAT);
@@ -80,8 +80,8 @@ Game::Game()
   pass_Cbloom_color_final = MKPTR(graphics::GLPass, fbo_Cbloom_final, 0, "tex_color");
   fbo_Cbloom_final->update();
   fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/2, H/2, false);
-  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W/2,H/4, false);
+  fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W/2,H/2, false);
   pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color");
   pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color");
   pass_Cdof_color_vblur = MKPTR(graphics::GLPass, fbo_Cdof_vblur, 0, "tex_dof");
@@ -97,7 +97,7 @@ Game::Game()
   shader_Cdof_final = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/dof.frag");
   shader_Cdof_final->attachUniform(pass_Cdof_color_vblur->unif);
   shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
-  shader_Cdof_final->attachUniform(world->fbo->unif_depth);
+  shader_Cdof_final->attachUniform(world->mfbo->unif_depth);
   shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
   
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
@@ -243,92 +243,100 @@ void Game::render()
     }
   else
     {
-      fbo_reflection->use();
-      pass_color_reflection->use();
-      world->isWaterPass = 1;
-      camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
-      sky->render();
-      world->render();
-      fbo_reflection->unuse();
-      pass_color_reflection->useTex();
-      camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
-      world->isWaterPass = 0;
+      if(world->renderMode==0)
+	{
+	  fbo_reflection->use();
+	  pass_color_reflection->use();
+	  world->isWaterPass = 1;
+	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+	  sky->render();
+	  world->render();
+	  fbo_reflection->unuse();
+	  pass_color_reflection->useTex();
+	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+	  world->isWaterPass = 0;
       
-      fbo->use();
-      pass_color->use();
-      sky->render();
-      world->render();
-      fbo->unuse();
-      pass_color->useTex();
+	  fbo->use();
+	  pass_color->use();
+	  sky->render();
+	  world->render();
+	  fbo->unuse();
+	  pass_color->useTex();
       
-      world->use(ocean);
-      ocean->render(world);
+	  world->use(ocean);
+	  ocean->render(world);
       
-      //compositing
-      ocean->pass_color->useTex();
-      ocean->pass_normal->useTex();
-      ocean->fbo->useTex();
-      fbo->useTex();
-      fbo_Cwater->use();
-      pass_Cwater_color->use();
-      pass_Cwater_depth->use();
-      comp_water->draw();
-      fbo_Cwater->unuse();  
-      fbo_Cwater->useTex();
-      pass_Cwater_color->useTex();
-      pass_Cwater_depth->useTex();
+	  //compositing
+	  ocean->pass_color->useTex();
+	  ocean->pass_normal->useTex();
+	  ocean->fbo->useTex();
+	  fbo->useTex();
+	  fbo_Cwater->use();
+	  pass_Cwater_color->use();
+	  pass_Cwater_depth->use();
+	  comp_water->draw();
+	  fbo_Cwater->unuse();  
+	  fbo_Cwater->useTex();
+	  pass_Cwater_color->useTex();
+	  pass_Cwater_depth->useTex();
       
-      //bloom
-      comp_bloom->shader = shader_Cbloom_sub;
-      fbo_Cbloom_sub->use();
-      pass_Cbloom_color_sub->use();
-      comp_bloom->draw();
-      fbo_Cbloom_sub->unuse();
-      pass_Cbloom_color_sub->useTex();
-      fbo_Cbloom_sub->useTex();
+	  //bloom
+	  comp_bloom->shader = shader_Cbloom_sub;
+	  fbo_Cbloom_sub->use();
+	  pass_Cbloom_color_sub->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_sub->unuse();
+	  pass_Cbloom_color_sub->useTex();
+	  fbo_Cbloom_sub->useTex();
       
-      fbo_Cbloom_hblur->use();
-      comp_bloom->shader = shader_Cbloom_hblur;
-      pass_Cbloom_color_hblur->use();
-      comp_bloom->draw();
-      fbo_Cbloom_hblur->unuse();
-      pass_Cbloom_color_hblur->useTex();
-      fbo_Cbloom_hblur->useTex();
+	  fbo_Cbloom_hblur->use();
+	  comp_bloom->shader = shader_Cbloom_hblur;
+	  pass_Cbloom_color_hblur->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_hblur->unuse();
+	  pass_Cbloom_color_hblur->useTex();
+	  fbo_Cbloom_hblur->useTex();
       
-      fbo_Cbloom_vblur->use();
-      comp_bloom->shader = shader_Cbloom_vblur;
-      pass_Cbloom_color_vblur->use();
-      comp_bloom->draw();
-      fbo_Cbloom_vblur->unuse();
-      pass_Cbloom_color_vblur->useTex();
-      fbo_Cbloom_vblur->useTex();
+	  fbo_Cbloom_vblur->use();
+	  comp_bloom->shader = shader_Cbloom_vblur;
+	  pass_Cbloom_color_vblur->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_vblur->unuse();
+	  pass_Cbloom_color_vblur->useTex();
+	  fbo_Cbloom_vblur->useTex();
       
-      comp_bloom->shader = shader_Cbloom_final;
-      fbo_Cbloom_final->use();
-      comp_bloom->draw();
-      fbo_Cbloom_final->unuse();
-      pass_Cbloom_color_final->useTex();
+	  comp_bloom->shader = shader_Cbloom_final;
+	  fbo_Cbloom_final->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_final->unuse();
+	  pass_Cbloom_color_final->useTex();
       
-      comp_bloom->shader = shader_Cdof_down;
-      fbo_Cdof_down->use();
-      comp_bloom->draw();
-      fbo_Cdof_down->unuse();
-      pass_Cdof_color_down->useTex();
+	  comp_bloom->shader = shader_Cdof_down;
+	  fbo_Cdof_down->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_down->unuse();
+	  pass_Cdof_color_down->useTex();
       
-      comp_bloom->shader = shader_Cdof_hblur;
-      fbo_Cdof_hblur->use();
-      comp_bloom->draw();
-      fbo_Cdof_hblur->unuse();
-      pass_Cdof_color_hblur->useTex();
+	  comp_bloom->shader = shader_Cdof_hblur;
+	  fbo_Cdof_hblur->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_hblur->unuse();
+	  pass_Cdof_color_hblur->useTex();
       
-      comp_bloom->shader = shader_Cdof_vblur;
-      fbo_Cdof_vblur->use();
-      comp_bloom->draw();
-      fbo_Cdof_vblur->unuse();
-      pass_Cdof_color_vblur->useTex();
+	  comp_bloom->shader = shader_Cdof_vblur;
+	  fbo_Cdof_vblur->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_vblur->unuse();
+	  pass_Cdof_color_vblur->useTex();
       
-      comp_bloom->shader = shader_Cdof_final;
-      comp_bloom->draw();
+	  comp_bloom->shader = shader_Cdof_final;
+	  comp_bloom->draw();
+	}
+      else
+	{
+	  sky->render();
+	  world->render();
+	}
     }
 }
 
@@ -383,6 +391,10 @@ void Game::onKey(GLFWwindow* window)
   if(glfwGetKeyOnce(window,GLFW_KEY_D) == GLFW_PRESS)
     {
       debugMode = !debugMode;
+    }
+  if(glfwGetKeyOnce(window,GLFW_KEY_R) == GLFW_PRESS)
+    {
+      world->renderMode = (world->renderMode+1)%5;
     }
   #define SCALE_INC 1.05
   if(glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
