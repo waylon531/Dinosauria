@@ -65,6 +65,7 @@ DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
   rot.y = node.attribute("rot").as_float();
   body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
   body->body->setDamping(.8,.8);
+  body->body->setActivationState(DISABLE_DEACTIVATION);
 }
 
 DinosaurInstance::~DinosaurInstance()
