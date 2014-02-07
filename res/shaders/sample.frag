@@ -16,10 +16,10 @@ out vec4 fParams;
 #define PIXEL_X (1.f/1280.f)
 #define PIXEL_Y (1.f/1024.f)
 
-#define THRESHOLD 0.3
-#define BLUR_SPAN 5
-#define STOP_THRESHOLD 0.15
-#define FALLOFF 1.0
+#define THRESHOLD 0.15
+#define BLUR_SPAN 10
+#define STOP_THRESHOLD 0.25
+#define FALLOFF 0.8
 //#define DISPLAY_EDGES
 
 float lum(vec4 v)

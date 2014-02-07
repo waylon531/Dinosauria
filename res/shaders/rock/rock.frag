@@ -2,8 +2,8 @@
 
 uniform mat4 m_model;
 
-in vec3 vObjPosition;
 in vec3 vPosition;
+in vec3 vObjPosition;
 
 out vec4 fColor;
 out vec4 fNormal;

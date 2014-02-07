@@ -40,14 +40,6 @@ namespace graphics
     std::shared_ptr<graphics::GLSL> shader_deffered;
     std::shared_ptr<graphics::Compositor> comp_deffered;
 
-    std::shared_ptr<graphics::GLFrameBuffer> mfbo;
-    std::shared_ptr<graphics::GLPass> mpass_color;
-    std::shared_ptr<graphics::GLPass> mpass_normal;
-    std::shared_ptr<graphics::GLPass> mpass_params; 
-    std::shared_ptr<graphics::GLPass> mpass_position;
-    std::shared_ptr<graphics::GLSL> shader_sample;
-    std::shared_ptr<graphics::Compositor> comp_sample;
-
     /** The shadow buffer list */
     std::unique_ptr<GLFrameBuffer> b_shadow[N_SHADOW_BUFFERS];
 

@@ -33,6 +33,11 @@ float rand(vec2 n)
   return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+float nrand(vec2 n)
+{
+  return rand(n)*2.0-1.0;
+}
+
 #define AO_RAD 0.01
 #define AO_SAMPLES 10
 #define AO_FALLOFF .000002
@@ -40,7 +45,7 @@ float rand(vec2 n)
 float getSSAO(vec3 normal)
 {
   vec3 pSphere[10] = vec3[](vec3(-0.010735935, 0.01647018, 0.0062425877),vec3(-0.06533369, 0.3647007, -0.13746321),vec3(-0.6539235, -0.016726388, -0.53000957),vec3(0.40958285, 0.0052428036, -0.5591124),vec3(-0.1465366, 0.09899267, 0.15571679),vec3(-0.44122112, -0.5458797, 0.04912532),vec3(0.03755566, -0.10961345, -0.33040273),vec3(0.019100213, 0.29652783, 0.066237666),vec3(0.8765323, 0.011236004, 0.28265962),vec3(0.29264435, -0.40794238, 0.15964167));
-  vec3 fres = normalize(vec3(rand(vTexCoord.st), rand(vTexCoord.ts), rand(1.0-vTexCoord.st))*2.0-1.0);
+  vec3 fres = normalize(vec3(nrand(vTexCoord.st), nrand(vTexCoord.st+vec2(1,1)), nrand(vec2(1,1)-vTexCoord.st)));
   float bl = 0.0;
   float radD = AO_RAD / depth;
   float occDepth, depthDiff;
@@ -53,7 +58,7 @@ float getSSAO(vec3 normal)
       vec2 coord = vTexCoord.st + /*sign(dot(ray,sNormal))**/ray.xy;
       occDepth = toDepth(texture2D(tex_depth, coord).r);
       occNorm = texture2D(tex_normal, coord).xyz;
-      depthDiff = depth - occDepth;
+      depthDiff = (depth - occDepth);
       if(depthDiff>0.0)
 	{
 	  bl += max(0.0,step(AO_FALLOFF, depthDiff) * (1.0-dot(occNorm,normal)) * (1.0-smoothstep(AO_FALLOFF,AO_STRENGTH,depthDiff)));
@@ -62,6 +67,7 @@ float getSSAO(vec3 normal)
   return 1.0 - bl/2.0;
 }
 
+#define SHADOW_RES 1024
 
 float occluded(vec3 normal)
 {
@@ -78,29 +84,49 @@ float occluded(vec3 normal)
       UV = coords.xy;
       if(!(UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) break;
       scale *= 4.0;
+      if(b==N_SHADOW_BUFFERS) return 1.0;
     }
-  if((UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) return 1.0;
+  //if((UV.x < 0.0 || UV.x > 1.0 || UV.y < 0.0 || UV.y > 1.0)) return 1.0;
   //UV.x = 0.5 * coords.x + 0.5;
   //UV.y = 0.5 * coords.y + 0.5;
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
-  float bias = clamp(scale*0.05*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.05);
+  float bias = clamp(0.03*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.05);
+  bias = 0.005;
+  ivec2 pix = ivec2(UV*SHADOW_RES);
+  float xoff = (UV.x - float(pix.x)/SHADOW_RES)*SHADOW_RES;
+  float yoff = (UV.y - float(pix.y)/SHADOW_RES)*SHADOW_RES;
+  
+
+#define SHADOWMAP(texCoord) (texture2D(tex_shadow[b],texCoord).x < (depth-bias) ? 0.:1.)
+  /*return SHADOWMAP(UV);
   float depthS = texture2D(tex_shadow[b], UV).x;
-  if(depthS < (depth - bias)) return 0.;
-  return 1.0;
+  if(depthS < (depth-bias)) return 0.;
+  return 1.0;*/
+
+  return mix(mix(SHADOWMAP(vec2(pix.x,pix.y)/SHADOW_RES), SHADOWMAP(vec2(pix.x+1,pix.y)/SHADOW_RES), xoff), mix(SHADOWMAP(vec2(pix.x,pix.y+1)/SHADOW_RES), SHADOWMAP(vec2(pix.x+1,pix.y+1)/SHADOW_RES), xoff), yoff);
+  //return mix(mix(shadowmap(vec2(pix.x,pix.y)/SHADOW_RES, bias, b), shadowmap(vec2(pix.x+1,pix.y)/SHADOW_RES, bias, b), xoff), mix(shadowmap(vec2(pix.x,pix.y+1)/SHADOW_RES, bias, b), shadowmap(vec2(pix.x+1,pix.y+1)/SHADOW_RES, bias, b),xoff), yoff);;
 }
 
+float calculateDiffuse(vec3 normal)
+{
+  return params.x * clamp(dot(normal,sunDir),0.0,1.0);
+}
+
+float calculateSpecular(vec3 normal)
+{ 
+  float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);
+  return params.y*pow(specular,params.z);
+}
+  
 #define AMBIENT .0
-#define AO .4
+#define AO .2
 vec3 computeLighting(vec3 base, vec3 normal)
 {
-  float specular = clamp(dot(eyeDir,reflect(sunDir,normal)),0.0,1.0);
-  specular = pow(specular,params.z);
-  float diffuse = clamp(dot(normal,sunDir),0.0,1.0);
   float ambient = 1.0;
   float ao = getSSAO(normal);
   //return vec3(ao)*AO;
-  return base*((params.y*specular + params.x*diffuse)*occluded(normal) + AMBIENT*ambient + AO*ao);
+  return base * ((calculateSpecular(normal) + calculateDiffuse(normal))*occluded(normal) + AMBIENT*ambient + AO*ao);
 }
 
 
@@ -128,6 +154,22 @@ void main()
       fColor = vec4(vec3(getSSAO(normal)),1.f);
     }
   if(passNum==4)
+    {
+      fColor = vec4(color,1.f);
+    }
+  if(passNum==5)
+    {
+      fColor = vec4(vec3(calculateDiffuse(normal)),1.f);
+    }
+  if(passNum==6)
+    {
+      fColor = vec4(vec3(calculateSpecular(normal)),1.f);
+    }
+  if(passNum==7)
+    {
+      fColor = vec4(computeLighting(vec3(1,1,1),normal),1.f);
+    }
+  if(passNum==8)
     {
       fColor = vec4(vec3(occluded(normal)),1.f);
     }

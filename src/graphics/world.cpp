@@ -10,34 +10,20 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
       depthTexArray[b] = b_shadow[b]->id_tex_depth;
     }
 
-  mfbo = MKPTR(graphics::GLFrameBuffer, W,H, true,"tex_depth");
-  mpass_color = MKPTR(graphics::GLPass, mfbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
-  mpass_normal = MKPTR(graphics::GLPass, mfbo, 1, "tex_normal");
-  mpass_position = MKPTR(graphics::GLPass, mfbo, 2, "tex_position", GL_RGBA32F, GL_HALF_FLOAT);
-  mpass_params = MKPTR(graphics::GLPass, mfbo, 3, "tex_params", GL_RGBA32F, GL_HALF_FLOAT);
-
-  fbo = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
   pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_normal = MKPTR(graphics::GLPass, fbo, 1, "tex_normal");
   pass_position = MKPTR(graphics::GLPass, fbo, 2, "tex_position", GL_RGBA32F, GL_HALF_FLOAT);
   pass_params = MKPTR(graphics::GLPass, fbo, 3, "tex_params", GL_RGBA32F, GL_HALF_FLOAT);
 
-  mfbo->update();
   fbo->update();
-
-  shader_sample = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/sample.frag");
-  shader_sample->attachUniform(mpass_color->unif);
-  shader_sample->attachUniform(mpass_normal->unif);
-  shader_sample->attachUniform(mpass_params->unif);
-  shader_sample->attachUniform(mpass_position->unif);
-  comp_sample = MKPTR(graphics::Compositor, shader_sample);
 
   shader_deffered = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/deffered.frag");
   shader_deffered->attachUniform(pass_color->unif);
   shader_deffered->attachUniform(pass_normal->unif);
   shader_deffered->attachUniform(pass_params->unif);
   shader_deffered->attachUniform(pass_position->unif);
-  shader_deffered->attachUniform(mfbo->unif_depth);
+  shader_deffered->attachUniform(fbo->unif_depth);
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "eyeDir", &(cam->dir)));
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "sunDir", &sun));
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "m_view", &(cam->mat_view)));
@@ -102,7 +88,7 @@ void graphics::World::render()
       glClear(GL_DEPTH_BUFFER_BIT);
       //m_lightView = camera->mat_view;
       #define TMP 10
-      #define Z_TMP 20
+      #define Z_TMP 40
       glm::mat4 m_lightProject = glm::ortho<float>(-TMP*scale,TMP*scale,-TMP*scale,TMP*scale,-Z_TMP,Z_TMP);//glm::mat4(1.0);//glm::ortho<float>(0.0, SHADOW_W, 1.0, SHADOW_H);
       m_light[0] = m_lightProject * m_lightView;
       for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
@@ -125,7 +111,7 @@ void graphics::World::render()
     {
       b_shadow[b]->useTex();
     }
-  mfbo->use();
+  fbo->use();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
     {
@@ -136,15 +122,8 @@ void graphics::World::render()
       //(*it)->setMatrixLight(m_light2);
       (*it)->render();
     } 
-  mfbo->unuse();
-  mfbo->useTex();
-  mpass_color->useTex();
-  mpass_normal->useTex();
-  mpass_params->useTex();
-  mpass_position->useTex();
-  fbo->use();
-  comp_sample->draw();
   fbo->unuse();
+  fbo->useTex();
   pass_color->useTex();
   pass_normal->useTex();
   pass_params->useTex();

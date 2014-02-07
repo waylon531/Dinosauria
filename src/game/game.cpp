@@ -39,7 +39,7 @@ Game::Game()
   shader_Cwater->attachUniform(pass_color->unif);
   shader_Cwater->attachUniform(fbo_reflection->unif_depth);
   shader_Cwater->attachUniform(pass_color_reflection->unif);
-  shader_Cwater->attachUniform(world->mfbo->unif_depth);
+  shader_Cwater->attachUniform(world->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
@@ -97,8 +97,15 @@ Game::Game()
   shader_Cdof_final = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/dof/dof.frag");
   shader_Cdof_final->attachUniform(pass_Cdof_color_vblur->unif);
   shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
-  shader_Cdof_final->attachUniform(world->mfbo->unif_depth);
+  shader_Cdof_final->attachUniform(world->fbo->unif_depth);
   shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
+
+  mfbo = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  mpass_color = MKPTR(graphics::GLPass, mfbo, 0, "tex_color");
+  mfbo->update();
+  shader_sample = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/sample.frag");
+  shader_sample->attachUniform(mpass_color->unif);
+  comp_sample = MKPTR(graphics::Compositor, shader_sample);
   
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
   shader_Cbasic->attachUniform(pass_color->unif);
@@ -328,9 +335,13 @@ void Game::render()
 	  comp_bloom->draw();
 	  fbo_Cdof_vblur->unuse();
 	  pass_Cdof_color_vblur->useTex();
-      
+
+	  mfbo->use();
 	  comp_bloom->shader = shader_Cdof_final;
 	  comp_bloom->draw();
+	  mfbo->unuse();
+	  mpass_color->useTex();
+	  comp_sample->draw();
 	}
       else
 	{
@@ -394,7 +405,7 @@ void Game::onKey(GLFWwindow* window)
     }
   if(glfwGetKeyOnce(window,GLFW_KEY_R) == GLFW_PRESS)
     {
-      world->renderMode = (world->renderMode+1)%5;
+      world->renderMode = (world->renderMode+1)%9;
     }
   #define SCALE_INC 1.05
   if(glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
