@@ -53,6 +53,7 @@ DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino
 {
   body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
   body->body->setDamping(.8,.8);
+  body->body->setActivationState(DISABLE_DEACTIVATION);
   time = 0;
 }
 
