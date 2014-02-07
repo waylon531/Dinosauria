@@ -18,5 +18,5 @@ void main()
 {
   gl_Position = (m_project * m_view * m_model) * vec4(position,1.f);
   vObjPosition = position;
-  vPosition = gl_Position.xyz;
+  vPosition = (m_model * vec4(position,1.f)).xyz;
 }

@@ -345,8 +345,12 @@ void Game::render()
 	}
       else
 	{
+	  mfbo->use();
 	  sky->render();
 	  world->render();
+	  mfbo->unuse();
+	  mpass_color->useTex();
+	  comp_sample->draw();
 	}
     }
 }

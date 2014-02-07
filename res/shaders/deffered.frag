@@ -28,6 +28,13 @@ float toDepth(float z)
   return 2. * (2.0 * n) / (f + n - z * (f - n));
 }
 
+float toShadowDepth(float z)
+{
+  float n = -40; // camera z near
+  float f = 40.0; // camera z far
+  return 2. * (2.0 * n) / (f + n - z * (f - n));
+}
+
 float rand(vec2 n)
 {
   return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) * 43758.5453);
@@ -68,6 +75,9 @@ float getSSAO(vec3 normal)
 }
 
 #define SHADOW_RES 1024
+#define USE_PCF
+#define USE_ESM
+#define ESM_C 20.0
 
 float occluded(vec3 normal)
 {
@@ -92,19 +102,30 @@ float occluded(vec3 normal)
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
   float bias = clamp(0.03*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.05);
-  bias = 0.005;
+  //bias = 0.005;
   ivec2 pix = ivec2(UV*SHADOW_RES);
   float xoff = (UV.x - float(pix.x)/SHADOW_RES)*SHADOW_RES;
   float yoff = (UV.y - float(pix.y)/SHADOW_RES)*SHADOW_RES;
   
 
+#ifdef USE_ESM
+#define SHADOWMAP(texCoord) clamp(2.0-exp(ESM_C*(depth - texture2D(tex_shadow[b],texCoord).x)), 0.0, 1.0)
+#else
 #define SHADOWMAP(texCoord) (texture2D(tex_shadow[b],texCoord).x < (depth-bias) ? 0.:1.)
+#endif
   /*return SHADOWMAP(UV);
   float depthS = texture2D(tex_shadow[b], UV).x;
   if(depthS < (depth-bias)) return 0.;
   return 1.0;*/
 
+#ifdef USE_PCF
   return mix(mix(SHADOWMAP(vec2(pix.x,pix.y)/SHADOW_RES), SHADOWMAP(vec2(pix.x+1,pix.y)/SHADOW_RES), xoff), mix(SHADOWMAP(vec2(pix.x,pix.y+1)/SHADOW_RES), SHADOWMAP(vec2(pix.x+1,pix.y+1)/SHADOW_RES), xoff), yoff);
+#endif
+#ifdef USE_ESM
+  float depthS = texture2D(tex_shadow[b],UV).x;
+  //if(depthS > depth-bias) return 1.0;
+  return clamp(2.0-exp(ESM_C*(depth - depthS)), 0.0, 1.0);
+#endif
   //return mix(mix(shadowmap(vec2(pix.x,pix.y)/SHADOW_RES, bias, b), shadowmap(vec2(pix.x+1,pix.y)/SHADOW_RES, bias, b), xoff), mix(shadowmap(vec2(pix.x,pix.y+1)/SHADOW_RES, bias, b), shadowmap(vec2(pix.x+1,pix.y+1)/SHADOW_RES, bias, b),xoff), yoff);;
 }
 
