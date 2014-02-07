@@ -29,6 +29,9 @@ namespace graphics
 
   public:
 
+    /** The rendering mode used */
+    int renderMode;
+
     std::shared_ptr<graphics::GLFrameBuffer> fbo;
     std::shared_ptr<graphics::GLPass> pass_color;
     std::shared_ptr<graphics::GLPass> pass_normal;

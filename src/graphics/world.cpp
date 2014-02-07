@@ -10,12 +10,14 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
       depthTexArray[b] = b_shadow[b]->id_tex_depth;
     }
 
-  fbo = MKPTR(graphics::GLFrameBuffer, W,H, true,"tex_depth");
+  fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
   pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_normal = MKPTR(graphics::GLPass, fbo, 1, "tex_normal");
   pass_position = MKPTR(graphics::GLPass, fbo, 2, "tex_position", GL_RGBA32F, GL_HALF_FLOAT);
   pass_params = MKPTR(graphics::GLPass, fbo, 3, "tex_params", GL_RGBA32F, GL_HALF_FLOAT);
+
   fbo->update();
+
   shader_deffered = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/deffered.frag");
   shader_deffered->attachUniform(pass_color->unif);
   shader_deffered->attachUniform(pass_normal->unif);
@@ -32,6 +34,8 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
       shader_deffered->attachUniform(std::shared_ptr<GLSLUniform>(new GLSLUniform(("m_light["+asString(b)+"]").c_str(), &m_light2[b])));
     }
   comp_deffered = MKPTR(graphics::Compositor, shader_deffered);
+  renderMode = 0;
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "passNum", &renderMode));  
 }
 
 graphics::World::~World()
@@ -83,8 +87,8 @@ void graphics::World::render()
       b_shadow[b]->use();
       glClear(GL_DEPTH_BUFFER_BIT);
       //m_lightView = camera->mat_view;
-      #define TMP 5
-      #define Z_TMP 20
+      #define TMP 10
+      #define Z_TMP 40
       glm::mat4 m_lightProject = glm::ortho<float>(-TMP*scale,TMP*scale,-TMP*scale,TMP*scale,-Z_TMP,Z_TMP);//glm::mat4(1.0);//glm::ortho<float>(0.0, SHADOW_W, 1.0, SHADOW_H);
       m_light[0] = m_lightProject * m_lightView;
       for(std::vector<std::shared_ptr<RenderableObjectExt>>::iterator it=meshs.begin(); it!=meshs.end(); it++)
@@ -100,7 +104,7 @@ void graphics::World::render()
 	}
       m_light2[b] = m_bias * m_light[0];
       b_shadow[b]->unuse();
-      scale *= 2.f;
+      scale *= 4.f;
     }
   //color pass
   for(int b=0; b<N_SHADOW_BUFFERS; b++)

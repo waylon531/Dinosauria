@@ -16,7 +16,7 @@ include_directories(src external/include)
 
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Lexternal/lib")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow -g")
 
 if(APPLE)
 	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -34,39 +34,29 @@ if(UNIX)
 endif()
 
 #find OpenGL
-find_package(OpenGL)
-if(OPENGL_FOUND)
-	include_directories(${OPENGL_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${OPENGL_LIBRARIES})
-
-endif()
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${OPENGL_LIBRARIES})
 
 #find GLEW
-find_package(GLEW)
-if(GLEW_FOUND)
-	include_directories(${GLEW_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${GLEW_LIBRARIES})
-else()
-	error(GLEW not found)
-endif()
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${GLEW_LIBRARIES})
 
 #find Freetype
-find_package(Freetype)
-if(FREETYPE_FOUND)
-	include_directories(${FREETYPE_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${FREETYPE_LIBRARIES})
-else()
-	error(Freetype not found)
-endif()
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${FREETYPE_LIBRARIES})
 
 #find PNG
-find_package(PNG)
-if(PNG_FOUND)
-	include_directories(${PNG_INCLUDE_DIRS})
-	target_link_libraries(bin/dinosauria ${PNG_LIBRARIES})
-else()
-	error(LibPng not found)
-endif()
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${PNG_LIBRARIES})
+
+#find Bullet
+find_package(Bullet REQUIRED)
+include_directories(${BULLET_INCLUDE_DIRS})
+target_link_libraries(bin/dinosauria ${BULLET_LIBRARIES})
 
 target_link_libraries(bin/dinosauria glfw3)
 target_link_libraries(bin/dinosauria noise)

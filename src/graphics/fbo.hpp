@@ -9,7 +9,7 @@
 
 namespace graphics
 {
-#define N_SHADOW_BUFFERS 4
+#define N_SHADOW_BUFFERS 5
   /** A OpenGL frame buffer wrapper
    * This will implement a render-to-texture effect */
   class GLFrameBuffer

@@ -3,18 +3,26 @@
 #define CAMERA_POS glm::vec3(0.f,4.f,-5.f)
 #define CAMERA_START glm::vec3(0.f,30.f,0.f)
 
+#define NUM_ROCKS 64
+
 Game::Game()
 {
   graphics::u_time = std::shared_ptr<graphics::GLSLUniform>(new graphics::GLSLUniform("t",&time));
   camera = std::shared_ptr<graphics::Camera>(new graphics::Camera(CAMERA_START,
 								  glm::vec3(0.f,0.f,0.f)));
   camScale = 1.0f;
+  debugMode = false;
   
   world = std::shared_ptr<graphics::World>(new graphics::World(camera));
   sky = std::shared_ptr<graphics::Sky>(new graphics::Sky(glm::vec3(.2f,.2f,.5f)));
   ground = std::shared_ptr<Landscape>(new Landscape);
   world->addMesh(ground);
   ocean = std::shared_ptr<Ocean>(new Ocean);
+
+  init_rocks();
+
+  physicsWorld = std::shared_ptr<physics::World>(new physics::World);
+  physicsWorld->world->setDebugDrawer(new physics::DebugDraw);
   
   fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
   pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
@@ -49,8 +57,8 @@ Game::Game()
 #define BLOOM_W (W/4)
 #define BLOOM_H (H/4)
   fbo_Cbloom_sub = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
-  fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cbloom_hblur = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
+  fbo_Cbloom_vblur = MKPTR(graphics::GLFrameBuffer, BLOOM_W,BLOOM_H, false);
   pass_Cbloom_color_sub = MKPTR(graphics::GLPass, fbo_Cbloom_sub, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
   pass_Cbloom_color_hblur = MKPTR(graphics::GLPass, fbo_Cbloom_hblur, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
   pass_Cbloom_color_vblur = MKPTR(graphics::GLPass, fbo_Cbloom_vblur, 0, "tex_bloom",GL_RGBA32F,GL_HALF_FLOAT);
@@ -72,8 +80,8 @@ Game::Game()
   pass_Cbloom_color_final = MKPTR(graphics::GLPass, fbo_Cbloom_final, 0, "tex_color");
   fbo_Cbloom_final->update();
   fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/2, H/2, false);
-  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
-  fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W/2,H/4, false);
+  fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W/2,H/2, false);
   pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color");
   pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color");
   pass_Cdof_color_vblur = MKPTR(graphics::GLPass, fbo_Cdof_vblur, 0, "tex_dof");
@@ -91,6 +99,13 @@ Game::Game()
   shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
   shader_Cdof_final->attachUniform(world->fbo->unif_depth);
   shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
+
+  mfbo = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  mpass_color = MKPTR(graphics::GLPass, mfbo, 0, "tex_color");
+  mfbo->update();
+  shader_sample = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/sample.frag");
+  shader_sample->attachUniform(mpass_color->unif);
+  comp_sample = MKPTR(graphics::Compositor, shader_sample);
   
   std::shared_ptr<graphics::GLSL> shader_Cbasic = MKPTR(graphics::GLSL,"res/shaders/fbo_pass.vert","res/effects/basic.frag");
   shader_Cbasic->attachUniform(pass_color->unif);
@@ -127,13 +142,25 @@ void Game::load(const std::string& dir, float* value, float* value2, Callback& c
       pugi::xml_node player_node = doc.child("player");
       player = std::shared_ptr<DinosaurInstance>(new DinosaurInstance(player_node));
       world->addMesh(player);
+      physicsWorld->addBody(player->body);
       pugi::xml_node game_node = doc.child("game");
       time = game_node.attribute("time").as_int();
     }
+
   *value+=inc;
   callback.call();
   ground->reset();
   ground->loadMap(dir, value2,callback);
+  physicsWorld->addBody(ground->body);
+
+  for(int i=0; i<NUM_ROCKS; i++)
+    {
+      std::shared_ptr<Rock> rock(new Rock(ground));
+      world->addMesh(rock);
+      physicsWorld->addBody(rock->body);
+      rocks.push_back(rock);
+    }
+  
   *value+=inc;
   callback.call();
 #undef NUM_TASKS
@@ -147,6 +174,14 @@ void Game::start(float* value, float* value2, Callback& callback)
   *value=0.f;
   ground->reset();
   ground->generate(value2, callback);
+  for(int i=0; i<NUM_ROCKS; i++)
+    {
+      std::shared_ptr<Rock> rock(new Rock(ground));
+      world->addMesh(rock);
+      physicsWorld->addBody(rock->body);
+      rocks.push_back(rock);
+    }
+  physicsWorld->addBody(ground->body);
   *value+=inc;
 #undef NUM_TASKS
 }
@@ -174,11 +209,19 @@ void Game::setPlayer(std::shared_ptr<Dinosaur> dino)
 {
   player = std::shared_ptr<DinosaurInstance>(new DinosaurInstance(dino));
   world->addMesh(player);
+  physicsWorld->addBody(player->body);
   player->pos = glm::vec3(0.f,0.f,0.f);
 }
 
 void Game::render()
 {
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  physicsWorld->step();
+  
 #define ALPHA 0.025f
   glm::vec3 camLoc = getCameraLoc();
   camera->setPos(camera->pos*(1.0f-ALPHA) + camLoc*ALPHA);
@@ -193,98 +236,127 @@ void Game::render()
   world->sun = glm::normalize(glm::vec3(cosa*.25f,sin(angle),cosa*.75f));
   //world->sun = glm::normalize(glm::vec3(1.01f,1.01f,1.01f));
 
-  fbo_reflection->use();
-  pass_color_reflection->use();
-  world->isWaterPass = 1;
-  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
   sky->render();
-  world->render();
-  fbo_reflection->unuse();
-  pass_color_reflection->useTex();
-  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
-  world->isWaterPass = 0;
-  
-  fbo->use();
-  pass_color->use();
-  sky->render();
-  world->render();
-  fbo->unuse();
-  pass_color->useTex();
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixf((const GLfloat*)&camera->mat_project[0][0]);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadMatrixf((const GLfloat*)&camera->mat_view[0][0]);
 
-  world->use(ocean);
-  ocean->render(world);
+  if(debugMode)
+    {
+      physicsWorld->world->debugDrawWorld();
+      ((physics::DebugDraw*)physicsWorld->world->getDebugDrawer())->renderFrame();
+      ((physics::DebugDraw*)physicsWorld->world->getDebugDrawer())->startFrame();
+    }
+  else
+    {
+      if(world->renderMode==0)
+	{
+	  fbo_reflection->use();
+	  pass_color_reflection->use();
+	  world->isWaterPass = 1;
+	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+	  sky->render();
+	  world->render();
+	  fbo_reflection->unuse();
+	  pass_color_reflection->useTex();
+	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+	  world->isWaterPass = 0;
+      
+	  fbo->use();
+	  pass_color->use();
+	  sky->render();
+	  world->render();
+	  fbo->unuse();
+	  pass_color->useTex();
+      
+	  world->use(ocean);
+	  ocean->render(world);
+      
+	  //compositing
+	  ocean->pass_color->useTex();
+	  ocean->pass_normal->useTex();
+	  ocean->fbo->useTex();
+	  fbo->useTex();
+	  fbo_Cwater->use();
+	  pass_Cwater_color->use();
+	  pass_Cwater_depth->use();
+	  comp_water->draw();
+	  fbo_Cwater->unuse();  
+	  fbo_Cwater->useTex();
+	  pass_Cwater_color->useTex();
+	  pass_Cwater_depth->useTex();
+      
+	  //bloom
+	  comp_bloom->shader = shader_Cbloom_sub;
+	  fbo_Cbloom_sub->use();
+	  pass_Cbloom_color_sub->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_sub->unuse();
+	  pass_Cbloom_color_sub->useTex();
+	  fbo_Cbloom_sub->useTex();
+      
+	  fbo_Cbloom_hblur->use();
+	  comp_bloom->shader = shader_Cbloom_hblur;
+	  pass_Cbloom_color_hblur->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_hblur->unuse();
+	  pass_Cbloom_color_hblur->useTex();
+	  fbo_Cbloom_hblur->useTex();
+      
+	  fbo_Cbloom_vblur->use();
+	  comp_bloom->shader = shader_Cbloom_vblur;
+	  pass_Cbloom_color_vblur->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_vblur->unuse();
+	  pass_Cbloom_color_vblur->useTex();
+	  fbo_Cbloom_vblur->useTex();
+      
+	  comp_bloom->shader = shader_Cbloom_final;
+	  fbo_Cbloom_final->use();
+	  comp_bloom->draw();
+	  fbo_Cbloom_final->unuse();
+	  pass_Cbloom_color_final->useTex();
+      
+	  comp_bloom->shader = shader_Cdof_down;
+	  fbo_Cdof_down->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_down->unuse();
+	  pass_Cdof_color_down->useTex();
+      
+	  comp_bloom->shader = shader_Cdof_hblur;
+	  fbo_Cdof_hblur->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_hblur->unuse();
+	  pass_Cdof_color_hblur->useTex();
+      
+	  comp_bloom->shader = shader_Cdof_vblur;
+	  fbo_Cdof_vblur->use();
+	  comp_bloom->draw();
+	  fbo_Cdof_vblur->unuse();
+	  pass_Cdof_color_vblur->useTex();
 
-  //compositing
-  ocean->pass_color->useTex();
-  ocean->pass_normal->useTex();
-  ocean->fbo->useTex();
-  fbo->useTex();
-  fbo_Cwater->use();
-  pass_Cwater_color->use();
-  pass_Cwater_depth->use();
-  comp_water->draw();
-  fbo_Cwater->unuse();  
-  fbo_Cwater->useTex();
-  pass_Cwater_color->useTex();
-  pass_Cwater_depth->useTex();
-  
-  //bloom
-  comp_bloom->shader = shader_Cbloom_sub;
-  fbo_Cbloom_sub->use();
-  pass_Cbloom_color_sub->use();
-  comp_bloom->draw();
-  fbo_Cbloom_sub->unuse();
-  pass_Cbloom_color_sub->useTex();
-  fbo_Cbloom_sub->useTex();
-  
-  fbo_Cbloom_hblur->use();
-  comp_bloom->shader = shader_Cbloom_hblur;
-  pass_Cbloom_color_hblur->use();
-  comp_bloom->draw();
-  fbo_Cbloom_hblur->unuse();
-  pass_Cbloom_color_hblur->useTex();
-  fbo_Cbloom_hblur->useTex();
-  
-  fbo_Cbloom_vblur->use();
-  comp_bloom->shader = shader_Cbloom_vblur;
-  pass_Cbloom_color_vblur->use();
-  comp_bloom->draw();
-  fbo_Cbloom_vblur->unuse();
-  pass_Cbloom_color_vblur->useTex();
-  fbo_Cbloom_vblur->useTex();
-  
-  comp_bloom->shader = shader_Cbloom_final;
-  fbo_Cbloom_final->use();
-  comp_bloom->draw();
-  fbo_Cbloom_final->unuse();
-  pass_Cbloom_color_final->useTex();
-
-  comp_bloom->shader = shader_Cdof_down;
-  fbo_Cdof_down->use();
-  comp_bloom->draw();
-  fbo_Cdof_down->unuse();
-  pass_Cdof_color_down->useTex();
-
-  comp_bloom->shader = shader_Cdof_hblur;
-  fbo_Cdof_hblur->use();
-  comp_bloom->draw();
-  fbo_Cdof_hblur->unuse();
-  pass_Cdof_color_hblur->useTex();
-
-  comp_bloom->shader = shader_Cdof_vblur;
-  fbo_Cdof_vblur->use();
-  comp_bloom->draw();
-  fbo_Cdof_vblur->unuse();
-  pass_Cdof_color_vblur->useTex();
-
-  comp_bloom->shader = shader_Cdof_final;
-  comp_bloom->draw();
+	  mfbo->use();
+	  comp_bloom->shader = shader_Cdof_final;
+	  comp_bloom->draw();
+	  mfbo->unuse();
+	  mpass_color->useTex();
+	  comp_sample->draw();
+	}
+      else
+	{
+	  sky->render();
+	  world->render();
+	}
+    }
 }
 
 void Game::resetGame()
 {
   camera->setPos(CAMERA_START);
   world->removeMesh(player);
+  physicsWorld->removeBody(player->body);
+  physicsWorld->removeBody(ground->body);
   player.reset();
 }
 
@@ -302,25 +374,38 @@ void Game::onMouseRelease(const glm::vec2& pos)
 }
 void Game::onKey(GLFWwindow* window)
 {
+#define ROT_INC 5.f
   if(glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-      player->zrot += 1.f;
+      player->rot.y += ROT_INC;
     }
   if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-      player->zrot -= 1.f;
+      player->rot.y -= ROT_INC;
     }
   if(glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
     {
-      player->pos += glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f));
+      player->body->impulseTranslate(glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f)));
     }
   if(glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-      player->pos -= glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f));
+      player->body->impulseTranslate(-glm::vec3(player->matrix * glm::vec4(.0f,.0f,player->parent->speed,0.f)));
+    }
+  if(glfwGetKeyOnce(window,GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+      player->body->impulseTranslate(glm::vec3(player->matrix * glm::vec4(.0f,10.f,0.f,0.f)));
     }
   if(glfwGetKeyOnce(window,GLFW_KEY_Z) == GLFW_PRESS)
     {
       ground->isWireframe = 1-ground->isWireframe;
+    }
+  if(glfwGetKeyOnce(window,GLFW_KEY_D) == GLFW_PRESS)
+    {
+      debugMode = !debugMode;
+    }
+  if(glfwGetKeyOnce(window,GLFW_KEY_R) == GLFW_PRESS)
+    {
+      world->renderMode = (world->renderMode+1)%9;
     }
   #define SCALE_INC 1.05
   if(glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)

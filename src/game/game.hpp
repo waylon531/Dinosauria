@@ -4,10 +4,12 @@
 #include "game/dinosaur.hpp"
 #include "game/landscape.hpp"
 #include "game/water.hpp"
+#include "game/rock.hpp"
 #include "graphics/world.hpp"
 #include "graphics/sky.hpp"
 #include "graphics/fbo.hpp"
 #include "graphics/post.hpp"
+#include "physics/physics.hpp"
 
 /** A strcture to hold all data needed for a specific game */
 class Game
@@ -18,11 +20,13 @@ private:
   std::shared_ptr<graphics::Sky> sky;
 
   std::shared_ptr<graphics::World> world;
+  std::shared_ptr<physics::World> physicsWorld;
 
   std::shared_ptr<graphics::Camera> camera;
 
   std::shared_ptr<Landscape> ground;
   std::shared_ptr<Ocean> ocean;
+  std::vector<std::shared_ptr<Rock>> rocks;
 
   std::shared_ptr<graphics::GLFrameBuffer> fbo;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_reflection;
@@ -48,7 +52,7 @@ private:
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_hblur;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_vblur;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cbloom_final;
-
+  
   std::shared_ptr<graphics::GLSL> shader_Cdof_down;
   std::shared_ptr<graphics::GLSL> shader_Cdof_hblur;
   std::shared_ptr<graphics::GLSL> shader_Cdof_vblur;
@@ -61,6 +65,14 @@ private:
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_vblur;
   
   std::shared_ptr<graphics::Compositor> comp_basic;
+
+  //FXAA
+  
+  std::shared_ptr<graphics::GLFrameBuffer> mfbo;
+  std::shared_ptr<graphics::GLPass> mpass_color;
+  std::shared_ptr<graphics::GLSL> shader_sample;
+  std::shared_ptr<graphics::Compositor> comp_sample;
+
   
   /** Get the ideal camera position
    * @return ideal location of a camera */
@@ -71,6 +83,9 @@ private:
   float camScale;
 
   int time;
+
+  /** Whether the game is drawn in bullet debug mode or not */
+  bool debugMode;
 
 public:
 

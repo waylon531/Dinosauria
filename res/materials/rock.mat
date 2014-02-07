@@ -1,0 +1,3 @@
+vert res/shaders/rock/rock.vert
+frag res/shaders/rock/rock.frag
+link

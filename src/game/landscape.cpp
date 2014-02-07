@@ -43,6 +43,9 @@ void Landscape::initMesh(float* value, Callback& callback)
   material->addTexture(tex_tangent);
   std::shared_ptr<graphics::GLTexture2D> tex_bitangent(new graphics::GLTexture2D(bmap, RES,RES, "tex_bitangent", GL_RGBA,GL_RGB));
   material->addTexture(tex_bitangent);
+
+  //body = std::shared_ptr<physics::RigidBody>(new physics::Mesh);
+
   
   material_shadow->addTexture(tex_normal);
   for(int xx=0; xx<INIT_RES; xx++)
@@ -51,7 +54,7 @@ void Landscape::initMesh(float* value, Callback& callback)
       for(int yy=0; yy<INIT_RES; yy++)
 	{
 	  int y = RES_RATIO * yy;
-	  glm::vec3 vpos = glm::vec3(((float)x-RES/2.f)*(SCALE/RES), 0.0f, ((float)y-RES/2.f)*(SCALE/RES));
+	  glm::vec3 vpos = glm::vec3(((float)x-RES/2.f)*(SCALE/RES), hmap[xx*INIT_RES+yy], ((float)y-RES/2.f)*(SCALE/RES));
 	  verts[xx*INIT_RES+yy] = (attrib){vpos, glm::vec2(y/(float)RES, x/(float)RES), nmap[x*RES+y]};
 	  inds[(xx*INIT_RES+yy)*4+0] = xx*INIT_RES+yy;
 	  inds[(xx*INIT_RES+yy)*4+1] = clamp(xx+1,0,INIT_RES-1)*INIT_RES+yy;
@@ -60,10 +63,19 @@ void Landscape::initMesh(float* value, Callback& callback)
 	  /*inds[(xx*INIT_RES+yy)*6+4] = clamp(xx+1,0,INIT_RES-1)*INIT_RES+yy;
 	    inds[(xx*INIT_RES+yy)*6+5] = xx*INIT_RES+clamp(yy+1,0,INIT_RES-1);*/
 	}
-    }  graphics::GLSLAttributeSet attrs(std::vector<graphics::GLSLAttribute>({graphics::GLSLAttribute("position",3), graphics::GLSLAttribute("texCoord",2), graphics::GLSLAttribute("normal",3)}));
+    }
+  /*for(int i=0; i<INIT_RES*INIT_RES; i++)
+    {
+      ((physics::Mesh*)body.get())->addTriangle(verts[inds[i*4+0]].pos, verts[inds[i*4+1]].pos, verts[inds[i*4+2]].pos);
+      ((physics::Mesh*)body.get())->addTriangle(verts[inds[i*4+1]].pos, verts[inds[i*4+2]].pos, verts[inds[i*4+3]].pos);
+    }
+    ((physics::Mesh*)body.get())->buildMesh();*/
+  graphics::GLSLAttributeSet attrs(std::vector<graphics::GLSLAttribute>({graphics::GLSLAttribute("position",3), graphics::GLSLAttribute("texCoord",2), graphics::GLSLAttribute("normal",3)}));
   b_verts = std::unique_ptr<graphics::GLVertexBuffer>(new graphics::GLVertexBuffer(verts, INIT_RES*INIT_RES, attrs));
   b_inds = std::unique_ptr<graphics::GLIndexBuffer>(new graphics::GLIndexBuffer(inds, INIT_RES*INIT_RES*4));
   m_model = glm::mat4();
+
+  body = std::shared_ptr<physics::RigidBody>(new physics::Heightfield(hmap, RES, RES, HSCALE, SCALE));
 }  
 
 void Landscape::generate(float* value, Callback& callback)
@@ -87,7 +99,6 @@ void Landscape::loadMap(const std::string& dir, float* value, Callback& callback
   bmap = readFloatFile(RES,RES,dir+"ground_b.float");
   initMesh(value,callback);
 }
-
 
 void Landscape::reset()
 {

@@ -4,6 +4,8 @@
 #include "graphics/mesh.hpp"
 #include "graphics/texture.hpp"
 #include "pgen/terrain.hpp"
+#include "physics/land.hpp"
+#include "physics/mesh.hpp"
 
 /** A landscape controller */
 class Landscape: public graphics::RenderableObjectExt
@@ -43,6 +45,9 @@ private:
   GLint tessMax;
   
 public:
+
+  /** The rigid body object */
+  std::shared_ptr<physics::RigidBody> body;
 
   /** The view matrix to use for tesselation during the shadow pass */
   glm::mat4* m_tessView;

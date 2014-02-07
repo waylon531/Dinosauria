@@ -3,6 +3,7 @@
 
 #include "graphics/mesh.hpp"
 #include "graphics/bmesh.hpp"
+#include "physics/hull.hpp"
 #include <pugixml.hpp>
 #include "game/landscape.hpp"
 
@@ -49,11 +50,14 @@ public:
   /** The parent dinosaur template */
   std::shared_ptr<Dinosaur> parent;
 
+  /** The rigid body capsule for this dinosaur */
+  std::shared_ptr<physics::RigidBody> body;
+
   /** The dinosaur's location */
   glm::vec3 pos;
 
   /** The z rotation of the dinosaur */
-  float zrot;
+  glm::vec3 rot;
 
   /** The model matrix */
   glm::mat4 matrix;
