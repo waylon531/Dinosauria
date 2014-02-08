@@ -9,6 +9,7 @@
 #include "graphics/sky.hpp"
 #include "graphics/fbo.hpp"
 #include "graphics/post.hpp"
+#include "graphics/skydome.hpp"
 #include "physics/physics.hpp"
 
 /** A strcture to hold all data needed for a specific game */
@@ -27,6 +28,7 @@ private:
   std::shared_ptr<Landscape> ground;
   std::shared_ptr<Ocean> ocean;
   std::vector<std::shared_ptr<Rock>> rocks;
+  std::shared_ptr<graphics::Skydome> skydome;
 
   std::shared_ptr<graphics::GLFrameBuffer> fbo;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_reflection;
@@ -63,6 +65,10 @@ private:
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_down;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_hblur;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cdof_vblur;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_Cflare;
+  std::shared_ptr<graphics::GLPass> pass_Cflare_color;
+  std::shared_ptr<graphics::GLSL> shader_Cflare;
+  std::shared_ptr<graphics::Compositor> comp_flare;
   
   std::shared_ptr<graphics::Compositor> comp_basic;
 

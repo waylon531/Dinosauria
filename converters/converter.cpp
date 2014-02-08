@@ -46,11 +46,20 @@ int main(int argc, char** argv)
 	      const aiVector3D* pos = &(mesh->mVertices[i]);
 	      const aiVector3D* normal = &(mesh->mNormals[i]);
 	      const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
-	      const aiVector3D* tangent = &(mesh->mTangents[i]);
+	      const aiVector3D* tangentptr = &(mesh->mTangents[i]);
+	      aiVector3D tangent;
+	      if(!mesh->mTangents)
+		{
+		  tangent = aiVector3D(0,0,0);
+		}
+	      else
+		{
+		  tangent = *tangentptr;
+		}
 	      attrib v = (attrib){glm::vec3(pos->x, pos->y, pos->z),
 				  glm::vec3(normal->x, normal->y, normal->z),
 				  glm::vec2(texCoord->x, texCoord->y),
-				  glm::vec3(tangent->x, tangent->y, tangent->z)};
+				  glm::vec3(tangent.x, tangent.y, tangent.z)};
 	      verts[i] = v;
 	    }
 	  for(unsigned int i=0; i<mesh->mNumFaces; i++)

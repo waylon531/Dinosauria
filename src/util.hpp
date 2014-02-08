@@ -12,6 +12,7 @@
 #include <vector>
 
 #define MKPTR(type,args...) std::shared_ptr<type>(new type(args))
+#define MKUPTR(type,args...) std::unique_ptr<type>(new type(args))
 
 using std::max;
 using std::min;

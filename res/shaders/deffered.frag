@@ -150,6 +150,21 @@ vec3 computeLighting(vec3 base, vec3 normal)
   return base * ((calculateSpecular(normal) + calculateDiffuse(normal))*occluded(normal) + AMBIENT*ambient + AO*ao);
 }
 
+#define SUN_RADIUS .01
+vec3 calcSkyColor()
+{
+  //unproject onto sphere
+  vec3 rayDir = (inverse(m_view) * vec4((inverse(m_project)*vec4(vTexCoord.st*2.0-1.0,0.f,1.f)).xyz,0.f)).xyz;
+  vec3 skyPos = normalize(rayDir);
+  //check if sun should be drawn
+  //return vec3(dot(sunDir,skyPos));
+  if(dot(sunDir, skyPos) > cos(SUN_RADIUS))
+    {
+      return vec3(10.f,10.f,10.f);
+    }
+  //get sky color
+  return vec3(dot(sunDir,skyPos)/2.0f,.5f,1.f);
+}
 
 void main()
 {
@@ -157,7 +172,13 @@ void main()
   vec3 color = texture2D(tex_color, vTexCoord.st).rgb;
   params = texture2D(tex_params, vTexCoord.st).xyz;
   position = texture2D(tex_position, vTexCoord.st).xyz;
-  depth = toDepth(texture2D(tex_depth, vTexCoord.st).r);
+  float z = texture2D(tex_depth, vTexCoord.st).r;
+  depth = toDepth(z);
+  if(1.0 == z)
+    {
+      fColor = vec4(calcSkyColor(), 1.f);
+      return;
+    }
   if(passNum==0)
     {
       fColor = vec4(computeLighting(color, normal),1.f);
@@ -168,7 +189,7 @@ void main()
     }
   if(passNum==2)
     {
-      fColor = vec4(vec3(1.f/(depth*5.f)),1.f);
+      fColor = vec4(vec3(z),1.f);
     }
   if(passNum==3)
     {

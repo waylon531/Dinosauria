@@ -82,9 +82,9 @@ Game::Game()
   fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/2, H/2, false);
   fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W/2,H/4, false);
   fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W/2,H/2, false);
-  pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color");
-  pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color");
-  pass_Cdof_color_vblur = MKPTR(graphics::GLPass, fbo_Cdof_vblur, 0, "tex_dof");
+  pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
+  pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
+  pass_Cdof_color_vblur = MKPTR(graphics::GLPass, fbo_Cdof_vblur, 0, "tex_dof",GL_RGBA32F,GL_HALF_FLOAT);
   fbo_Cdof_down->update();
   fbo_Cdof_hblur->update();
   fbo_Cdof_vblur->update();
@@ -99,6 +99,13 @@ Game::Game()
   shader_Cdof_final->attachUniform(pass_Cbloom_color_final->unif);
   shader_Cdof_final->attachUniform(world->fbo->unif_depth);
   shader_Cdof_final->attachUniform(MKPTR(graphics::GLSLUniform,"focalLength",&focalLength));
+
+  fbo_Cflare = MKPTR(graphics::GLFrameBuffer, W,H, false);
+  pass_Cflare_color = MKPTR(graphics::GLPass, fbo_Cflare, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
+  fbo_Cflare->update();
+  shader_Cflare = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert", "res/shaders/flare.frag");
+  shader_Cflare->attachUniform(pass_Cflare_color->unif);
+  comp_flare = MKPTR(graphics::Compositor, shader_Cflare);
 
   mfbo = MKPTR(graphics::GLFrameBuffer, W,H, false);
   mpass_color = MKPTR(graphics::GLPass, mfbo, 0, "tex_color");
@@ -213,6 +220,7 @@ void Game::setPlayer(std::shared_ptr<Dinosaur> dino)
   player->pos = glm::vec3(0.f,0.f,0.f);
 }
 
+int nullint;
 void Game::render()
 {
   physicsWorld->step();
@@ -236,14 +244,13 @@ void Game::render()
   world->sun = glm::normalize(glm::vec3(cosa*.25f,sin(angle),cosa*.75f));
   //world->sun = glm::normalize(glm::vec3(1.01f,1.01f,1.01f));
 
-  sky->render();
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixf((const GLfloat*)&camera->mat_project[0][0]);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadMatrixf((const GLfloat*)&camera->mat_view[0][0]);
-
   if(debugMode)
     {
+      sky->render();
+      glMatrixMode(GL_PROJECTION);
+      glLoadMatrixf((const GLfloat*)&camera->mat_project[0][0]);
+      glMatrixMode(GL_MODELVIEW);
+      glLoadMatrixf((const GLfloat*)&camera->mat_view[0][0]);
       physicsWorld->world->debugDrawWorld();
       ((physics::DebugDraw*)physicsWorld->world->getDebugDrawer())->renderFrame();
       ((physics::DebugDraw*)physicsWorld->world->getDebugDrawer())->startFrame();
@@ -252,11 +259,12 @@ void Game::render()
     {
       if(world->renderMode==0)
 	{
+	  
 	  fbo_reflection->use();
 	  pass_color_reflection->use();
 	  world->isWaterPass = 1;
 	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
-	  sky->render();
+	  glClear(GL_DEPTH_BUFFER_BIT);
 	  world->render();
 	  fbo_reflection->unuse();
 	  pass_color_reflection->useTex();
@@ -265,7 +273,8 @@ void Game::render()
       
 	  fbo->use();
 	  pass_color->use();
-	  sky->render();
+	  //sky->render();
+	  glClear(GL_DEPTH_BUFFER_BIT);
 	  world->render();
 	  fbo->unuse();
 	  pass_color->useTex();
@@ -336,9 +345,14 @@ void Game::render()
 	  fbo_Cdof_vblur->unuse();
 	  pass_Cdof_color_vblur->useTex();
 
-	  mfbo->use();
+	  fbo_Cflare->use();
 	  comp_bloom->shader = shader_Cdof_final;
 	  comp_bloom->draw();
+	  fbo_Cflare->unuse();
+	  pass_Cflare_color->useTex();
+	  
+	  mfbo->use();
+	  comp_flare->draw();
 	  mfbo->unuse();
 	  mpass_color->useTex();
 	  comp_sample->draw();
@@ -346,6 +360,7 @@ void Game::render()
       else
 	{
 	  mfbo->use();
+	  glClear(GL_DEPTH_BUFFER_BIT);
 	  sky->render();
 	  world->render();
 	  mfbo->unuse();
