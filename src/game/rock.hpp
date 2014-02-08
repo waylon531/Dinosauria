@@ -3,7 +3,7 @@
 
 #include "graphics/material.hpp"
 #include "graphics/mesh.hpp"
-#include "physics/sphere.hpp"
+#include "physics/hull.hpp"
 #include "game/landscape.hpp"
 #include <pugixml.hpp>
 

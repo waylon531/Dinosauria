@@ -51,9 +51,10 @@ void Dinosaur::render()
 
 DinosaurInstance::DinosaurInstance(std::shared_ptr<Dinosaur> dino) : parent(dino), pos(glm::vec3(0.f,0.f,0.f)), rot(0.f,0.f,0.f)
 {
-  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
+  body = std::shared_ptr<physics::RigidBody>(new physics::Capsule(parent->mesh, pos, .5));
   body->body->setDamping(.8,.8);
   body->body->setActivationState(DISABLE_DEACTIVATION);
+  body->body->setAngularFactor(btVector3(0,1,0));
   time = 0;
 }
 
@@ -64,9 +65,10 @@ DinosaurInstance::DinosaurInstance(pugi::xml_node& node)
   pos = parseVec3(node.attribute("pos").value());
   rot = glm::vec3(0.f,0.f,0.f);
   rot.y = node.attribute("rot").as_float();
-  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(parent->mesh, pos, .5));
+  body = std::shared_ptr<physics::RigidBody>(new physics::Capsule(parent->mesh, pos, .5));
   body->body->setDamping(.8,.8);
   body->body->setActivationState(DISABLE_DEACTIVATION);
+  body->body->setAngularFactor(btVector3(0,1,0));
 }
 
 DinosaurInstance::~DinosaurInstance()
@@ -85,10 +87,12 @@ void DinosaurInstance::save(pugi::xml_node& node)
 void DinosaurInstance::update(std::shared_ptr<Landscape> ground)
 {
   pos = body->getPosition();
-  pos.y -= ((physics::ConvexHull*)body.get())->offset/2;
-  body->setRotation(deg2rad(rot));
+  pos.y -= ((physics::Capsule*)body.get())->offset/2;
+
+  //rot.y = rad2deg(body->getRotation()).y;
+  body->setRotation(glm::vec3(0,deg2rad(rot.y),0));
   //pos.y = ground->eval(pos.x,pos.z);
-  matrix = glm::translate(pos) * glm::rotate(rot.y,0.f,1.f,0.f);
+  matrix = glm::translate(pos) * glm::rotate(rot.y,glm::vec3(0.f,1.f,0.f));
 }
 
 void DinosaurInstance::setMatrixView(glm::mat4* view)

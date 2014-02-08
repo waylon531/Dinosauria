@@ -3,7 +3,7 @@
 
 #include "graphics/mesh.hpp"
 #include "graphics/bmesh.hpp"
-#include "physics/hull.hpp"
+#include "physics/capsule.hpp"
 #include <pugixml.hpp>
 #include "game/landscape.hpp"
 

@@ -11,6 +11,10 @@ void physics::RigidBody::impulseTranslate(const glm::vec3& v)
   body->applyCentralImpulse(btVector3(v.x,v.y,v.z));
   //body->setLinearVelocity(body->getLinearVelocity()+btVector3(v.x,v.y,v.z));
 }
+void physics::RigidBody::impulseRotate(const glm::vec3& v)
+{
+  body->applyTorqueImpulse( btVector3( v.x, v.y, v.z));
+}
 
 void physics::RigidBody::initialize(const glm::vec3& pos, const float mass)
 { 
@@ -18,10 +22,10 @@ void physics::RigidBody::initialize(const glm::vec3& pos, const float mass)
     new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(pos.x,pos.y,pos.z)));
   //btScalar mass = .5;
   btVector3 fallInertia(0,0,0);
-  //shape->calculateLocalInertia(mass,fallInertia);
+  shape->calculateLocalInertia(mass,fallInertia);
   btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass,fallMotionState,shape,fallInertia);
   body = new btRigidBody(fallRigidBodyCI);
-  body->setDamping(0.1,.1);
+  body->setDamping(0.1,0);
 }
 
 void physics::RigidBody::update()

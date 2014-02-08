@@ -17,16 +17,16 @@ Rock::Rock(std::shared_ptr<Landscape> ground)
   float z = rand()/float(RAND_MAX);
   z *= 500;
   z -= 250;
-  float y = ground->eval(x, z) + 10;
+  float y = ground->eval(x, z) + 2;
   pos = glm::vec3(x,y,z);
-  body = std::shared_ptr<physics::RigidBody>(new physics::Sphere(2, pos, .1));
+  body = std::shared_ptr<physics::RigidBody>(new physics::ConvexHull(mesh, pos, .1));
   m_model = glm::translate(pos);
 }
 
 void Rock::render()
 {
   pos = body->getPosition();
-  glm::vec3 rot = body->getRotation();
+  glm::vec3 rot = rad2deg(body->getRotation());
   //std::cout << pos.x << "," << pos.y << "," << pos.z << std::endl;
   m_model = glm::translate(pos) * glm::rotate(rot.z,glm::vec3(0,0,1)) * glm::rotate(rot.y,glm::vec3(0,1,0)) * glm::rotate(rot.x,glm::vec3(1,0,0));
   mesh->m_model = m_model;

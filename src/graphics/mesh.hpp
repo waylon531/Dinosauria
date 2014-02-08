@@ -23,15 +23,10 @@ namespace graphics
       glm::vec3 pos;
       glm::vec3 normal;
       glm::vec2 texCoord;
+      glm::vec3 tangent;
     };
     
   private:
-
-    /** The vertex array */
-    attrib* verts;
-
-    /** The index array */
-    GLuint* inds;
 
     /** The vertex buffer */
     std::unique_ptr<GLVertexBuffer> b_vert;
@@ -48,6 +43,15 @@ namespace graphics
     void initShadow();
 
   public:
+
+    /** The number of vertices */
+    int nverts;
+
+    /** The vertex array */
+    attrib* verts;
+
+    /** The index array */
+    GLuint* inds;
 
     /** The model matrix */
     glm::mat4 m_model;

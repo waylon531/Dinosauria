@@ -378,14 +378,16 @@ void Game::onMouseRelease(const glm::vec2& pos)
 }
 void Game::onKey(GLFWwindow* window)
 {
-#define ROT_INC 5.f
+#define ROT_INC 4.f
   if(glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
     {
       player->rot.y += ROT_INC;
+      //player->body->impulseRotate(glm::vec3(0.f,ROT_INC,0.f));
     }
   if(glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
       player->rot.y -= ROT_INC;
+      //player->body->impulseRotate(glm::vec3(0.f,-ROT_INC,0.f));
     }
   if(glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
     {

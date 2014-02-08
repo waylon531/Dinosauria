@@ -15,6 +15,7 @@ struct attrib
   glm::vec3 pos;
   glm::vec3 normal;
   glm::vec2 texCoord;
+  glm::vec3 tangent;
 };
 
 int main(int argc, char** argv)
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
   Assimp::Importer importer;
 #define NORMAL_TYPE aiProcess_GenSmoothNormals
   const aiScene* pScene = importer.ReadFile(argv[1], aiProcess_Triangulate | NORMAL_TYPE);
+  pScene = importer.ApplyPostProcessing(aiProcess_CalcTangentSpace);
   if(pScene)
     {
       for(unsigned int i=0; i<pScene->mNumMeshes; i++)
@@ -44,9 +46,11 @@ int main(int argc, char** argv)
 	      const aiVector3D* pos = &(mesh->mVertices[i]);
 	      const aiVector3D* normal = &(mesh->mNormals[i]);
 	      const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
+	      const aiVector3D* tangent = &(mesh->mTangents[i]);
 	      attrib v = (attrib){glm::vec3(pos->x, pos->y, pos->z),
 				  glm::vec3(normal->x, normal->y, normal->z),
-				  glm::vec2(texCoord->x, texCoord->y)};
+				  glm::vec2(texCoord->x, texCoord->y),
+				  glm::vec3(tangent->x, tangent->y, tangent->z)};
 	      verts[i] = v;
 	    }
 	  for(unsigned int i=0; i<mesh->mNumFaces; i++)

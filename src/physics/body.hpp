@@ -67,7 +67,7 @@ namespace physics
     {
       btTransform trans;
       trans = body->getWorldTransform();
-      trans.setRotation(btQuaternion(btVector3(0,1,0),angle*M_PI/180.f));
+      trans.setRotation(btQuaternion(btVector3(0,1,0),angle));
       body->setWorldTransform(trans);
     }
     
@@ -77,6 +77,10 @@ namespace physics
     /** Apply a translational impulse to the rigid body
      * @param v impulse direction */
     void impulseTranslate(const glm::vec3& v);
+
+    /*** Apply a angular impulse to the rigid body
+     * @param v euler angle to rotate */
+    void impulseRotate(const glm::vec3& v);
     
   };
 };

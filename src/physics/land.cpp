@@ -1,7 +1,7 @@
 #include "physics/land.hpp"
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
-#define RES 128
+#define RES 256
 
 physics::Heightfield::Heightfield(float* hmap, const int xres, const int yres, const float hscale, const float scale)
 {

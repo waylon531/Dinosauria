@@ -21,6 +21,7 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
       fread(verts, sizeof(attrib), nv, f);
       fread(inds, sizeof(GLuint), nt*3, f);
       fclose(f);
+      nverts = nv;
     }
   else
     {
@@ -50,7 +51,8 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
 		  const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 		  attrib v = (attrib){glm::vec3(pos->x, pos->y, pos->z),
 				      glm::vec3(normal->x, normal->y, normal->z),
-				      glm::vec2(texCoord->x, texCoord->y)};
+				      glm::vec2(texCoord->x, texCoord->y),
+				      glm::vec3(0.f,0.f,0.f)};
 		  verts[i] = v;
 		}
 	      for(unsigned int i=0; i<mesh->mNumFaces; i++)
@@ -61,6 +63,7 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
 		  inds[i*3+2] = f.mIndices[2];
 		}
 	    }
+	  nverts = nv;
 	}
       else
 	{
@@ -68,11 +71,11 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
 	}
     }
   material = m;
-  GLSLAttributeSet attrs(std::vector<GLSLAttribute>({GLSLAttribute("position",3), GLSLAttribute("normal",3), GLSLAttribute("texCoord",2)}));
+  GLSLAttributeSet attrs(std::vector<GLSLAttribute>({GLSLAttribute("position",3), GLSLAttribute("normal",3), GLSLAttribute("texCoord",2),  GLSLAttribute("tangent",3)}));
   b_vert = std::unique_ptr<GLVertexBuffer>(new GLVertexBuffer(verts, nv, attrs));
   b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, nt*3));
   m_model = glm::mat4();
-  initShadow();  
+  initShadow();
 }
 
 graphics::Mesh::Mesh(attrib* v, GLuint* i, const int nv, const int ni, std::shared_ptr<Material> m)
@@ -80,9 +83,10 @@ graphics::Mesh::Mesh(attrib* v, GLuint* i, const int nv, const int ni, std::shar
   material = m;
   verts = v;
   inds = i;
-  GLSLAttributeSet attrs(std::vector<GLSLAttribute>({GLSLAttribute("position",3), GLSLAttribute("normal",3), GLSLAttribute("texCoord",2)}));
+  GLSLAttributeSet attrs(std::vector<GLSLAttribute>({GLSLAttribute("position",3), GLSLAttribute("normal",3), GLSLAttribute("texCoord",2), GLSLAttribute("tangent",3)}));
   b_vert = std::unique_ptr<GLVertexBuffer>(new GLVertexBuffer(verts, nv, attrs));
   b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, ni*3));
+  nverts = nv;
   initShadow();
 }
 
