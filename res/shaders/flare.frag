@@ -6,7 +6,7 @@ in vec2 vTexCoord;
 
 out vec4 fColor;
 
-#define THRESHOLD sqrt(2.f)
+#define THRESHOLD 1.2
 
 vec3 thresh(vec3 x)
 {
@@ -27,7 +27,7 @@ vec3 samplePt(vec2 texCoord)
       return vec3(0,0,0);
     }
   //thresh(texture2D(tex_color, vec2(texCoord.s )).rgb);
-  //preform blut
+  //preform blur
   vec3 final;
   for(int i=0; i<N_SAMPLES; i++)
     {
@@ -40,7 +40,7 @@ vec3 samplePt(vec2 texCoord)
 vec3 getVal(float scale)
 {
   vec2 texCoord = vTexCoord*2.0-1.0;
-  return 0.03*diffraction(scale)*samplePt((texCoord.st*scale + 1.0)*0.5);
+  //return 0.005*diffraction(scale)*samplePt((texCoord.st*scale + 1.0)*0.5);
   return vec3(0,0,0);
 }
 

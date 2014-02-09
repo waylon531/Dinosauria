@@ -29,6 +29,8 @@ float getBlur(float d)
 
 void main()
 {
+  //fColor = texture2D(tex_color, vTexCoord.st);
+  //return;
   float z = texture2D(tex_depth,vTexCoord.st).r;
   float depth = toDepth(z);
   float amount = clamp(getBlur(depth),0.0,1.0);

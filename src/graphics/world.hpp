@@ -55,6 +55,9 @@ namespace graphics
     /** If it is currently being rendered as a water pass */
     int isWaterPass;
 
+    /** The current time counter */
+    int time;
+
     /** Initialize from settings
      * @param cam camera for this world
      * @param s whether shadows should be used */

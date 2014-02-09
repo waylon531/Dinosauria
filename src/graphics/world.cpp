@@ -10,6 +10,8 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
       depthTexArray[b] = b_shadow[b]->id_tex_depth;
     }
 
+  time = 0;
+
   fbo = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth");
   pass_color = MKPTR(graphics::GLPass, fbo, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_normal = MKPTR(graphics::GLPass, fbo, 1, "tex_normal");
@@ -28,6 +30,7 @@ graphics::World::World(std::shared_ptr<Camera> cam, glm::vec3 sunDir, const bool
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "sunDir", &sun));
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "m_view", &(cam->mat_view)));
   shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "m_project", &(cam->mat_project)));
+  shader_deffered->attachUniform(MKPTR(graphics::GLSLUniform, "time", &time));
   for(int b=0; b<N_SHADOW_BUFFERS; b++)
     {
       shader_deffered->attachUniform(std::shared_ptr<GLSLUniform>(new GLSLUniform(("tex_shadow["+asString(b)+"]").c_str(), (GLint*)&depthTexArray[b])));
@@ -74,6 +77,7 @@ void graphics::World::use(std::shared_ptr<RenderableObjectExt> mesh)
 int FALSE = 0;
 void graphics::World::render()
 {
+  time++;
   //shadow pass
   glm::mat4 m_lightView = glm::lookAt(sun+camera->pos,camera->pos,glm::vec3(0.0,1.0,0.0));
   glm::mat4 m_bias(0.5,0.0,0.0,0.0,

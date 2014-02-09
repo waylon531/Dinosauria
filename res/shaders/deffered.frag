@@ -14,9 +14,188 @@ uniform vec3 sunDir,eyeDir;
 uniform sampler2D tex_shadow[N_SHADOW_BUFFERS];
 uniform mat4 m_light[N_SHADOW_BUFFERS];
 uniform int passNum;
+uniform int time;
 
 in vec2 vTexCoord;
 out vec4 fColor;
+
+//
+// GLSL textureless classic 3D noise "cnoise",
+// with an RSL-style periodic variant "pnoise".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-10-11
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/ashima/webgl-noise
+//
+
+vec3 mod289(vec3 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289(vec4 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x)
+{
+  return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r)
+{
+  return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+  return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+// Classic Perlin noise
+float cnoise(vec3 P)
+{
+  vec3 Pi0 = floor(P); // Integer part for indexing
+  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
+  vec3 Pf0 = fract(P); // Fractional part for interpolation
+  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+  vec4 iy = vec4(Pi0.yy, Pi1.yy);
+  vec4 iz0 = Pi0.zzzz;
+  vec4 iz1 = Pi1.zzzz;
+
+  vec4 ixy = permute(permute(ix) + iy);
+  vec4 ixy0 = permute(ixy + iz0);
+  vec4 ixy1 = permute(ixy + iz1);
+
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+  gx0 = fract(gx0);
+  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+  vec4 sz0 = step(gz0, vec4(0.0));
+  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+  gx1 = fract(gx1);
+  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+  vec4 sz1 = step(gz1, vec4(0.0));
+  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+
+  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+
+  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+  g000 *= norm0.x;
+  g010 *= norm0.y;
+  g100 *= norm0.z;
+  g110 *= norm0.w;
+  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+  g001 *= norm1.x;
+  g011 *= norm1.y;
+  g101 *= norm1.z;
+  g111 *= norm1.w;
+
+  float n000 = dot(g000, Pf0);
+  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+  float n111 = dot(g111, Pf1);
+
+  vec3 fade_xyz = fade(Pf0);
+  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
+  return 2.2 * n_xyz;
+}
+
+// Classic Perlin noise, periodic variant
+float pnoise(vec3 P, vec3 rep)
+{
+  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
+  vec3 Pf0 = fract(P); // Fractional part for interpolation
+  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+  vec4 iy = vec4(Pi0.yy, Pi1.yy);
+  vec4 iz0 = Pi0.zzzz;
+  vec4 iz1 = Pi1.zzzz;
+
+  vec4 ixy = permute(permute(ix) + iy);
+  vec4 ixy0 = permute(ixy + iz0);
+  vec4 ixy1 = permute(ixy + iz1);
+
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+  gx0 = fract(gx0);
+  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+  vec4 sz0 = step(gz0, vec4(0.0));
+  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+  gx1 = fract(gx1);
+  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+  vec4 sz1 = step(gz1, vec4(0.0));
+  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+
+  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+
+  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+  g000 *= norm0.x;
+  g010 *= norm0.y;
+  g100 *= norm0.z;
+  g110 *= norm0.w;
+  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+  g001 *= norm1.x;
+  g011 *= norm1.y;
+  g101 *= norm1.z;
+  g111 *= norm1.w;
+
+  float n000 = dot(g000, Pf0);
+  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+  float n111 = dot(g111, Pf1);
+
+  vec3 fade_xyz = fade(Pf0);
+  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
+  return 2.2 * n_xyz;
+}
 
 vec3 position;
 vec3 params;
@@ -78,7 +257,7 @@ float getSSAO(vec3 normal)
 #define SHADOW_RES 1024
 #define USE_PCF
 #define USE_ESM
-#define ESM_C 20.0
+#define ESM_C 80.0
 
 float occluded(vec3 normal)
 {
@@ -102,6 +281,7 @@ float occluded(vec3 normal)
   //UV.y = 0.5 * coords.y + 0.5;
   //lightSpace /= lightSpace.w;
   float depth = coords.z;
+  if(depth < 0.0 || depth > 1.0) return 1.0;
   float bias = clamp(0.03*tan(acos(clamp(dot(sunDir,normal),0.0,1.0))),0.0,0.05);
   //bias = 0.005;
   ivec2 pix = ivec2(UV*SHADOW_RES);
@@ -150,122 +330,31 @@ vec3 computeLighting(vec3 base, vec3 normal)
   //return vec3(ao)*AO;
   return base * ((calculateSpecular(normal) + calculateDiffuse(normal))*occluded(normal) + AMBIENT*ambient + AO*ao);
 }
-/*
-//nitrogen
-vec3 Kr = vec3(
-	       0.18867780436772762, 0.4978442963618773, 0.6616065586417131
-	       );
 
-float phase(float alpha, float g)
+#define PERS 0.6
+float cloudFractalNoise(vec3 v)
 {
-  float a = 3.0*(1.0-g*g);
-  float b = 2.0*(2.0+g*g);
-  float c = 1.0+alpha*alpha;
-  float d = pow(1.0+g*g-2.0*g*alpha, 1.5);
-  return (1/b)*(c/d);
+  //return cnoise(v) + (.5*cnoise(v*2)) + (.25*cnoise(v*4)) + (.125*cnoise(v*8)) + (.0625*cnoise(v*16));
+  return cnoise(v) + (PERS*cnoise(v*2)) + (PERS*PERS*cnoise(v*4)) + (PERS*PERS*PERS*cnoise(v*8)) + (PERS*PERS*PERS*PERS*cnoise(v*16));
 }
 
-float atmospheric_depth(vec3 position, vec3 dir)
+#define CLOUD_HEIGHT 10000.0
+vec4 getCloudColor(vec3 dir)
 {
-  float a = dot(dir, dir);
-  float b = 2.0*dot(dir, position);
-  float c = dot(position, position)-1.0;
-  float det = b*b-4.0*a*c;
-  float detSqrt = sqrt(det);
-  float q = (-b - detSqrt)/2.0;
-  float t1 = c/q;
-  return t1;
+  //get the point on a cloud plane
+  vec3 point = dir * (CLOUD_HEIGHT / dir.y);
+  if(dir.y<0.f) return vec4(0,0,0,0);
+  vec3 windDisplace = vec3(0,float(time)*0.0025,0);
+  float alpha = cloudFractalNoise(vec3(.00005*point.xz, float(time)*0.001) + windDisplace);
+  return vec4(1.,1.,1., step(0.0,alpha)*alpha);
 }
-
-float horizon_extinction(vec3 position, vec3 dir, float radius)
-{
-  float u = dot(dir, -position);
-  if(u<0.0){
-    return 1.0;
-  }
-  vec3 near = position + u*dir;
-  if(length(near) < radius){
-    return 0.0;
-  }
-  else{
-    vec3 v2 = normalize(near)*radius - position;
-    float diff = acos(dot(normalize(v2), dir));
-    return smoothstep(0.0, 1.0, pow(diff*2.0, 3.0));
-  }
-}
-
-vec3 absorb(float dist, vec3 color, float factor)
-{
-  return color-color*pow(Kr, vec3(factor/dist));
-}
-
-
-#define SUN_RADIUS .01
-#define SUN_ENERGY 15.
-#define RAYLEIGH_SCALE 33.3
-#define MIE_SCALE .1
-#define SPOT_SCALE 1000.0
-#define STEP_COUNT 16
-#define SCATTER_STRENGTH .25//.025
-#define RAYLEIGH_STRENGTH 1.39
-#define MIE_STRENGTH .0264
-#define MIE_POW .39
-#define RAYLEIGH_POW .81
-#define MIE_DISTRIB 6.3
-#define INTENSITY 1.8
-#define PLAYER_HEIGHT 0.99
-#define H_BIAS 0.15
-
-vec3 calcSkyColor()
-{
-  //unproject onto sphere
-  vec3 rayDir = (inverse(m_view) * vec4((inverse(m_project)*vec4(vTexCoord.st*2.0-1.0,0.f,1.f)).xyz,0.f)).xyz;
-  vec3 skyPos = normalize(rayDir);
-  //check if sun should be drawn
-  //return vec3(dot(sunDir,skyPos));
-  //if(dot(sunDir, skyPos) > cos(SUN_RADIUS))
-  //  {
-  //    return vec3(SUN_ENERGY);
-  //  }
-  //get sky color
-  float alpha = dot(sunDir, skyPos);
-
-  vec3 playerPos = vec3(0,PLAYER_HEIGHT,0);
-
-  float rayleigh_factor = phase(alpha, -0.01) * RAYLEIGH_SCALE;
-  float mie_factor = phase(alpha, MIE_DISTRIB) * MIE_SCALE;
-  float spot = smoothstep(0.0, SUN_ENERGY, 0.01*phase(alpha, 0.99995)) * SPOT_SCALE;
-  float eyeDepth = atmospheric_depth(playerPos,skyPos);
-  float eyeExtinction = horizon_extinction(playerPos, skyPos, PLAYER_HEIGHT-H_BIAS);
-
-  
-  float stepLen = eyeDepth/float(STEP_COUNT);
-  vec3 rayleigh = vec3(0);
-  vec3 mie = vec3(0);
-  for(int i=0; i<STEP_COUNT; i++)
-    {
-      float sampleDist = playerPos + stepLen * float(i);
-      vec3 pos = skyPos*sampleDist;
-      float sampleDepth = atmospheric_depth(pos, skyPos);
-      float sampleExtinction = horizon_extinction(pos, skyPos, PLAYER_HEIGHT - H_BIAS);
-      
-      vec3 influx = absorb(sampleDepth, vec3(INTENSITY), SCATTER_STRENGTH) * sampleExtinction;
-      rayleigh += absorb(sampleDist, Kr*influx, RAYLEIGH_SCALE);
-      mie += absorb(sampleDist, influx, MIE_SCALE);
-    }
-  rayleigh = (rayleigh * eyeExtinction * pow(eyeDepth, RAYLEIGH_POW))/float(STEP_COUNT);
-  mie = (mie * pow(eyeDepth, MIE_POW))/float(STEP_COUNT);
-  //return vec3(eyeDepth);
-  return spot*mie + mie_factor*mie + rayleigh_factor*rayleigh;
-}
-*/
 
 //sky code borrwed from http://codeflow.org/entries/2011/apr/13/advanced-webgl-part-2-sky-rendering/
 vec3 Kr = vec3(0.18867780436772762, 0.4978442963618773, 0.6616065586417131); // air
 //uniform float rayleigh_brightness, mie_brightness, spot_brightness, scatter_strength, rayleigh_strength, mie_strength;
 //uniform float rayleigh_collection_power, mie_collection_power, mie_distribution;
 #define rayleigh_brightness 3.3
-#define mie_brightness .1
+#define mie_brightness .03
 #define spot_brightness 1000.0
 #define scatter_strength .028
 #define rayleigh_strength .139
@@ -327,7 +416,7 @@ vec3 calcSkyColor()
 
   float rayleigh_factor = phase(alpha, -0.01)*rayleigh_brightness;
   float mie_factor = phase(alpha, mie_distribution)*mie_brightness;
-  float spot = smoothstep(0.0, 15.0, phase(alpha, 0.9995))*spot_brightness;
+  float spot = smoothstep(0.0, 15.0, 0.0005*phase(alpha, 0.9995))*spot_brightness;
 
   vec3 eye_position = vec3(0.0, surface_height, 0.0);
   float eye_depth = atmospheric_depth(eye_position, eyedir);
@@ -351,8 +440,9 @@ vec3 calcSkyColor()
   mie_collected = (mie_collected*eye_extinction*pow(eye_depth, mie_collection_power))/float(step_count);
 
   vec3 color = vec3(spot*mie_collected + mie_factor*mie_collected + rayleigh_factor*rayleigh_collected);
-
-  return color;
+  vec4 cloud = getCloudColor(eyedir);
+  
+  return mix(color, cloud.rgb, cloud.a);
 }
 
 void main()

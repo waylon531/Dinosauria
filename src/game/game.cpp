@@ -1,6 +1,6 @@
 #include "game/game.hpp"
 
-#define CAMERA_POS glm::vec3(0.f,4.f,-5.f)
+#define CAMERA_POS glm::vec3(0.f,2.f,-5.f)
 #define CAMERA_START glm::vec3(0.f,30.f,0.f)
 
 #define NUM_ROCKS 64
@@ -80,7 +80,7 @@ Game::Game()
   pass_Cbloom_color_final = MKPTR(graphics::GLPass, fbo_Cbloom_final, 0, "tex_color");
   fbo_Cbloom_final->update();
   fbo_Cdof_down = MKPTR(graphics::GLFrameBuffer, W/2, H/2, false);
-  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W/2,H/4, false);
+  fbo_Cdof_hblur = MKPTR(graphics::GLFrameBuffer, W/2,H/2, false);
   fbo_Cdof_vblur = MKPTR(graphics::GLFrameBuffer, W/2,H/2, false);
   pass_Cdof_color_down = MKPTR(graphics::GLPass, fbo_Cdof_down, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);
   pass_Cdof_color_hblur = MKPTR(graphics::GLPass, fbo_Cdof_hblur, 0, "tex_color",GL_RGBA32F,GL_HALF_FLOAT);

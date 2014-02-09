@@ -20,6 +20,7 @@ layout (location=1) out vec4 fDepth;
 #define REFRACTION_STEP 0.01
 #define MAX_REFRACT 5.0
 #define REFRACTION_SCALE 0.05
+#define R_MIN 0.2
 
 float toDepth(float z)
 {
@@ -64,7 +65,11 @@ void main()
 	  fDepth = vec4(z);
 	  vec4 color_water = texture2D(tex_water_color,vTexCoord.st).rgba;
 	  vec4 color_depth = mix(color_land,vec4(0.0,0.0,.5,1.0), clamp(0.01*(depth-water_depth),0.0,1.0));
-	  fColor = mix(color_depth, mix(color_water,color_land_reflect,.5), 0.5);
+	  float tmpC = abs(1.0 - dot(normalize(wNormal), -normalize(eyeDir-eyePos)));
+	  float fresnelTerm = R_MIN + (1.0 - R_MIN) * tmpC*tmpC*tmpC*tmpC*tmpC;
+	  //fColor = vec4(vec3(fresnelTerm),1.f);
+	  //return;
+	  fColor = mix(color_depth, mix(color_water,color_land_reflect,fresnelTerm), 0.5);
 	}
       else
 	{
