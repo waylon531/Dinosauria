@@ -47,6 +47,13 @@ void main()
 	  discard;
 	}
     }
+  if(waterFlag==2)
+    {
+      if(gPosition.y > 0.0f)
+	{
+	  discard;
+	}
+    }
 
   vec3 micro = mix( vec3(0.f,1.f,0.f), normalize(texture2D(tex_micronormal, gPosition.xz).rgb), 0.1);
   vec3 normal = texture2D(tex_normal, gTexCoord.st).rgb;

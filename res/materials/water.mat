@@ -1,3 +1,5 @@
 vert res/shaders/water.vert
 frag res/shaders/water.frag
 link
+tex res/textures/water/normal0.png tex_normal0
+tex res/textures/water/normal1.png tex_normal1

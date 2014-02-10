@@ -27,11 +27,11 @@ void main()
   //if(boneWeights[1]!=0.f) m_model2 += (boneTransforms[boneIds[1]] * boneWeights2[1]);
   //if(boneWeights[2]!=0.f) m_model2 += (boneTransforms[boneIds[2]] * boneWeights2[2]);
   //if(boneWeights[3]!=0.f) m_model2 += (boneTransforms[boneIds[3]] * boneWeights2[3]);
-  vec3 position2 = (m_model2 * vec4(position,1.f)).xyz;
-  mat4 PVM = m_project*m_view*m_model;
+  vec3 position2 = (m_model * m_model2 * vec4(position,1.f)).xyz;
+  mat4 PVM = m_project*m_view;
   gl_Position = PVM*vec4(position2,1.f);
-  vPosition = m_model*vec4(position2,1.f);
+  vPosition = vec4(position2,1.f);
   vPositionView = gl_Position;
-  vNormal = (m_model * vec4(normal,0.f)).xyz;
+  vNormal = (m_model * m_model2 * vec4(normal,0.f)).xyz;
   vTexCoord = texCoord;
 }

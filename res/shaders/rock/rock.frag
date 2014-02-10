@@ -27,6 +27,15 @@ void main()
 	  discard;
 	}
     }
+  if(waterFlag==-1)
+    {
+      //culling
+      if(vPosition.y > 0.f)
+	{
+	  discard;
+	}
+    }
+  
   vec3 bitangent = normalize(cross(vNormal, vTangent));
   fColor = vec4(.7,.7,.7,1.);//texture2D(tex_specular, vTexCoord);
   vec3 nmap = mix(vec3(0,1,0),texture2D(tex_normal, vTexCoord).rgb,0.5);

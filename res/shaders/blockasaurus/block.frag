@@ -29,6 +29,15 @@ void main()
 	  discard;
 	}
     }
+  if(waterFlag==2)
+    {
+      //culling
+      if(vPosition.y > 0.f)
+	{
+	  discard;
+	}
+    }
+
   vec3 base = texture2D(tex_skin, vTexCoord.st/2.f).xyz;
   //fColor = vec4(computeLighting(base, normalize(vNormal)), 1.0f);
   fColor = vec4(base,1.f);

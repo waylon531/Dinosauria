@@ -3,6 +3,8 @@
 uniform vec3 eyeDir;
 uniform vec3 sunDir;
 uniform sampler2D tex_normal;
+uniform sampler2D tex_normal0;
+uniform sampler2D tex_normal1;
 uniform int t;
 
 in vec2 vTexCoord;
@@ -134,9 +136,12 @@ void main()
 {
   //vec3 normal = texture2D(tex_normal, vTexCoord.st*5.0).xyz;
   vec3 coord = vec3(vTexCoord.st*500.0,t/25.0);
-  vec3 normal = vec3(snoise(coord.xyz),snoise(coord.zyx),snoise(coord.xzy));
+  vec3 normal0 = texture2D(tex_normal0,vec2(vTexCoord.s, vTexCoord.t+float(t)/7000.0)*50.0).rbg;
+  vec3 normal1 = texture2D(tex_normal1,vec2(vTexCoord.t+float(t)/11000.0, vTexCoord.s)*50.0).rbg;
+  vec3 normal = mix(normal0, normal1, 0.5);
+  //vec3 normal = vec3(snoise(coord.xyz),snoise(coord.zyx),snoise(coord.xzy));
   //vec3 normal = vec3(0.0,1.0,0.0);
-  normal = mix(vec3(0.0,1.0,0.0),normal,0.25);
+  //normal = mix(vec3(0.0,1.0,0.0),normal,0.25);
   fColor = vec4(computeLighting(vec3(0.5,0.5,.6), normal),1.0);
   fNormal = vec4(normal,1.f);
 }

@@ -29,6 +29,9 @@ Game::Game()
   fbo_reflection = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth_reverse");
   pass_color_reflection = MKPTR(graphics::GLPass, fbo_reflection, 0, "tex_color_reverse", GL_RGBA32F, GL_HALF_FLOAT);
   fbo_reflection->update();
+  fbo_refraction = MKPTR(graphics::GLFrameBuffer, W,H, true, "tex_depth_refract");
+  pass_color_refraction = MKPTR(graphics::GLPass, fbo_refraction, 0, "tex_color_refract", GL_RGBA32F, GL_HALF_FLOAT);
+  fbo_refraction->update();
   fbo_Cwater = MKPTR(graphics::GLFrameBuffer, W,H, false);
   pass_Cwater_color = MKPTR(graphics::GLPass, fbo_Cwater, 0, "tex_color", GL_RGBA32F, GL_HALF_FLOAT);
   pass_Cwater_depth = MKPTR(graphics::GLPass, fbo_Cwater, 1, "tex_depth");
@@ -37,13 +40,15 @@ Game::Game()
 
   shader_Cwater = MKPTR(graphics::GLSL, "res/shaders/fbo_pass.vert","res/effects/water_comp.frag");
   shader_Cwater->attachUniform(pass_color->unif);
+  shader_Cwater->attachUniform(world->fbo->unif_depth);
   shader_Cwater->attachUniform(fbo_reflection->unif_depth);
   shader_Cwater->attachUniform(pass_color_reflection->unif);
-  shader_Cwater->attachUniform(world->fbo->unif_depth);
+  shader_Cwater->attachUniform(fbo_refraction->unif_depth);;
+  shader_Cwater->attachUniform(pass_color_refraction->unif);
   shader_Cwater->attachUniform(ocean->fbo->unif_depth);
   shader_Cwater->attachUniform(ocean->pass_color->unif);
   shader_Cwater->attachUniform(ocean->pass_normal->unif);
-  shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyeDir",&camera->look));
+  shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyeDir",&camera->dir));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"eyePos",&camera->pos));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_view",&camera->mat_view));
   shader_Cwater->attachUniform(MKPTR(graphics::GLSLUniform,"m_project",&camera->mat_project));
@@ -259,16 +264,24 @@ void Game::render()
     {
       if(world->renderMode==0)
 	{
-	  
+	  camera->mat_view = camera->mat_view * glm::scale(glm::vec3(1.f,-1.f,1.f));
 	  fbo_reflection->use();
 	  pass_color_reflection->use();
 	  world->isWaterPass = 1;
-	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
-	  glClear(GL_DEPTH_BUFFER_BIT);
+	  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	  world->render();
 	  fbo_reflection->unuse();
 	  pass_color_reflection->useTex();
-	  camera->mat_view = camera->mat_view * glm::scale(1.f,-1.f,1.f);
+	  fbo_reflection->useTex();
+
+	  camera->mat_view = camera->mat_view * glm::scale(glm::vec3(1.f,-1.f,1.f));
+	  world->isWaterPass = 2;
+	  fbo_refraction->use();
+	  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	  world->render();
+	  fbo_refraction->unuse();
+	  fbo_refraction->useTex();
+	  pass_color_refraction->useTex();
 	  world->isWaterPass = 0;
       
 	  fbo->use();

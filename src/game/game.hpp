@@ -32,9 +32,11 @@ private:
 
   std::shared_ptr<graphics::GLFrameBuffer> fbo;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_reflection;
+  std::shared_ptr<graphics::GLFrameBuffer> fbo_refraction;
   std::shared_ptr<graphics::GLFrameBuffer> fbo_Cwater;
   std::shared_ptr<graphics::GLPass> pass_color;
   std::shared_ptr<graphics::GLPass> pass_color_reflection;
+  std::shared_ptr<graphics::GLPass> pass_color_refraction;
   std::shared_ptr<graphics::GLPass> pass_Cwater_color;
   std::shared_ptr<graphics::GLPass> pass_Cwater_depth;
   std::shared_ptr<graphics::GLSL> shader_Cwater;
