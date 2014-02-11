@@ -63,6 +63,7 @@ target_link_libraries(bin/dinosauria glfw3)
 target_link_libraries(bin/dinosauria noise)
 target_link_libraries(bin/dinosauria freetype-gl)
 target_link_libraries(bin/dinosauria pugixml)
+target_link_libraries(bin/dinosauria ngpcore)
 
 target_link_libraries(bin/converter assimp)
 target_link_libraries(bin/bconverter assimp)

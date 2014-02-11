@@ -19,6 +19,9 @@ Game::Game()
   world->addMesh(ground);
   ocean = std::shared_ptr<Ocean>(new Ocean);
 
+  std::shared_ptr<PlantSpecies> plant_test = MKPTR(PlantSpecies, "res/plants/test.ngp");
+  plant_species["test"] = plant_test;
+
   init_rocks();
 
   physicsWorld = std::shared_ptr<physics::World>(new physics::World);
@@ -135,6 +138,8 @@ Game::~Game()
   ground.reset();
 }
 
+#define NUM_PLANTS_TEST 16
+
 void Game::load(const std::string& dir, float* value, float* value2, Callback& callback)
 {
 #define NUM_TASKS 2
@@ -172,6 +177,14 @@ void Game::load(const std::string& dir, float* value, float* value2, Callback& c
       physicsWorld->addBody(rock->body);
       rocks.push_back(rock);
     }
+  for(int i=0; i<NUM_PLANTS_TEST; i++)
+    {
+      glm::vec3 pos = glm::vec3(rand()/float(RAND_MAX) * 500.0 - 250.0, 0.f, rand()/float(RAND_MAX) * 500.0 - 250.0);
+      pos.y = ground->eval(pos.x,pos.z);
+      std::shared_ptr<PlantInstance> instance = MKPTR(PlantInstance, plant_species["test"], rand()%8, pos, rand()/float(RAND_MAX) * 2.f * M_PI);
+      plants.push_back(instance);
+      world->addMesh(instance);
+    }
   
   *value+=inc;
   callback.call();
@@ -193,6 +206,15 @@ void Game::start(float* value, float* value2, Callback& callback)
       physicsWorld->addBody(rock->body);
       rocks.push_back(rock);
     }
+  for(int i=0; i<NUM_PLANTS_TEST; i++)
+    {
+      glm::vec3 pos = glm::vec3(rand()/float(RAND_MAX) * 500.0 - 250.0, 0.f, rand()/float(RAND_MAX) * 500.0 - 250.0);
+      pos.y = ground->eval(pos.x,pos.z);
+      std::shared_ptr<PlantInstance> instance = MKPTR(PlantInstance, plant_species["test"], rand()%8, pos, rand()/float(RAND_MAX) * 2.f * M_PI);
+      plants.push_back(instance);
+      world->addMesh(instance);
+    }
+
   physicsWorld->addBody(ground->body);
   *value+=inc;
 #undef NUM_TASKS
@@ -212,6 +234,7 @@ void Game::save(const std::string& name)
   player->save(node_player);
   pugi::xml_node node_game = doc.append_child("game");
   node_game.append_attribute("time") = asString(time).c_str();
+  
   doc.save_file((dir+"game.xml").c_str());
 
   ground->save(dir);
@@ -390,6 +413,16 @@ void Game::resetGame()
   physicsWorld->removeBody(player->body);
   physicsWorld->removeBody(ground->body);
   player.reset();
+  for(int i=0; i<rocks.size(); i++)
+    {
+      world->removeMesh(rocks[i]);
+      rocks.erase(rocks.begin() + i);
+    }
+  for(int i=0; i<plants.size(); i++)
+    {
+      world->removeMesh(plants[i]);
+      plants.erase(plants.begin() + i);
+    }
 }
 
 void Game::onMouseOver(const glm::vec2& pos)

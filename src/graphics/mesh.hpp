@@ -12,6 +12,55 @@
 namespace graphics
 {
 
+  /** A 3D bounding box */
+  class BBox3D
+  {
+  public:
+
+    /** Lowest point on box */
+    glm::vec3 low;
+
+    /** Highest point on box */
+    glm::vec3 high;
+
+    /** Initialize
+     * @param lo low point
+     * @param hi high point */
+    BBox3D(const glm::vec3& lo, const glm::vec3& hi) : low(lo), high(hi)
+    {
+    }
+
+    BBox3D()
+    {
+      low = glm::vec3(INFINITY,INFINITY,INFINITY);
+      high = glm::vec3(-INFINITY,-INFINITY,-INFINITY);
+    }
+
+    /** Get the union with a point
+     * @param p point */
+    inline BBox3D getUnion(const glm::vec3& p) const
+    {
+      return BBox3D(glm::vec3(min(low.x,p.x),
+			      min(low.y,p.y),
+			      min(low.z,p.z)),
+		    glm::vec3(max(high.x,p.x),
+			      max(high.y,p.y),
+			      max(high.z,p.z)));
+    }
+
+    /** Check if a point is in the bounding box
+     * @param p point */
+    inline bool inside(const glm::vec3& p) const
+    {
+      return (low.x < p.x) &&
+	(low.y < p.y) &&
+	(low.z < p.z) &&
+	(high.z > p.z) &&
+	(high.y > p.y) &&
+	(high.z > p.z);
+    }
+  };
+
   /** A triangle based mesh
    * This will handle all rendering so you only need to call render() */
   class Mesh: public RenderableObjectExt
@@ -42,6 +91,9 @@ namespace graphics
     /** Initialize the shadow shader */
     void initShadow();
 
+    /** Check if this object shoudl be culled */
+    bool getCulling();
+
   public:
 
     /** The number of vertices */
@@ -55,6 +107,12 @@ namespace graphics
 
     /** The model matrix */
     glm::mat4 m_model;
+
+    glm::mat4* m_view;
+    glm::mat4* m_project;
+
+    /** The object space bounding box */
+    BBox3D bbox;
 
     /** Initialize from a file
      * @param fname filename for mesh

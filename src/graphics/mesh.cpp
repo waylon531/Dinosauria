@@ -75,6 +75,10 @@ graphics::Mesh::Mesh(const std::string& fname, std::shared_ptr<Material> m, bool
   b_vert = std::unique_ptr<GLVertexBuffer>(new GLVertexBuffer(verts, nv, attrs));
   b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, nt*3));
   m_model = glm::mat4();
+  for(int i=0; i<nverts; i++)
+    {
+      bbox = bbox.getUnion(verts[i].pos);
+    }
   initShadow();
 }
 
@@ -87,6 +91,10 @@ graphics::Mesh::Mesh(attrib* v, GLuint* i, const int nv, const int ni, std::shar
   b_vert = std::unique_ptr<GLVertexBuffer>(new GLVertexBuffer(verts, nv, attrs));
   b_ind = std::unique_ptr<GLIndexBuffer>(new GLIndexBuffer(inds, ni*3));
   nverts = nv;
+  for(int i=0; i<nverts; i++)
+    {
+      bbox = bbox.getUnion(verts[i].pos);
+    }
   initShadow();
 }
 
@@ -109,39 +117,88 @@ graphics::Mesh::~Mesh()
   delete[] inds;
 }
 
+bool graphics::Mesh::getCulling()
+{
+  glm::vec2 lo(INFINITY,INFINITY);
+  glm::vec2 hi(-INFINITY,-INFINITY);
+  float maxZ = -1;
+  glm::vec3 pts[2] = {bbox.low, bbox.high};
+#pragma unroll
+  for(int x=0; x<2; x++)
+    {
+#pragma unroll
+      for(int y=0; y<2; y++)
+	{
+#pragma unroll
+	  for(int z=0; z<2; z++)
+	    {
+	      glm::vec4 np = (*m_project) * (*m_view) * m_model * glm::vec4(pts[x].x, pts[y].y, pts[z].z, 1.0);
+	      np /= np.w;
+	      lo.x = min(lo.x,np.x);
+	      lo.y = min(lo.y,np.y);
+	      hi.x = max(hi.x,np.x);
+	      hi.y = max(hi.y,np.y);
+	      maxZ = max(maxZ, np.z);
+	    }
+	}
+    }
+  if(maxZ < 0.f) return false;
+  glm::vec2 pts2[2] = {lo,hi};
+#pragma unroll
+  for(int x=0; x<2; x++)
+    {
+#pragma unroll
+      for(int y=0; y<2; y++)
+	{
+	  if((pts[x].x > -1.0) && (pts[x].x < 1.0) && (pts[y].y > -1.0) && (pts[y].y < 1.0)) return true;
+	}
+    }
+  return false;
+}
+      
+
 void graphics::Mesh::renderShadowPass()
 {
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  shader_shadow->use();
-  b_vert->use();
-  b_ind->use();
-  b_ind->draw(GL_TRIANGLES);
-  b_vert->unuse();
-  b_ind->unuse();
+  //preform culling
+  if(getCulling())
+    {
+      glEnable(GL_DEPTH_TEST);
+      glDisable(GL_CULL_FACE);
+      shader_shadow->use();
+      b_vert->use();
+      b_ind->use();
+      b_ind->draw(GL_TRIANGLES);
+      b_vert->unuse();
+      b_ind->unuse();
+    }
 }
 
 void graphics::Mesh::render()
 {
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  material->setMatrixModel(&m_model);
-  material->use();
-  b_vert->use();
-  b_ind->use();
-  b_ind->draw(GL_TRIANGLES);
-  b_vert->unuse();
-  b_ind->unuse();
+  if(getCulling())
+    {
+      glEnable(GL_DEPTH_TEST);
+      glDisable(GL_CULL_FACE);
+      material->setMatrixModel(&m_model);
+      material->use();
+      b_vert->use();
+      b_ind->use();
+      b_ind->draw(GL_TRIANGLES);
+      b_vert->unuse();
+      b_ind->unuse();
+    }
 }
 
 void graphics::Mesh::setMatrixView(glm::mat4* view)
 {
   material->setMatrixView(view);
+  m_view = view;
 }
 
 void graphics::Mesh::setMatrixProject(glm::mat4* project)
 {
   material->setMatrixProject(project);
+  m_project = project;
 }
 
 void graphics::Mesh::setWaterFlag(int* flag)
