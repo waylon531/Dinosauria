@@ -1,12 +1,11 @@
 *~
 \#*
 *.o
-*bin/dinosauria
+dinosauria
 *doc/html
 *doc/latex
-*saves/*
 *config.log
-./*.zip
+*.log
 CMakeCache.txt
 CMakeFiles
 CMakeFiles/*
@@ -18,3 +17,4 @@ install_manifest.txt
 Makefile
 Dinosauria*.zip
 *.a
+runTests
