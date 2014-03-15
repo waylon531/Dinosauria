@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Prototype/Background">
+  </Window>
+</GUILayout>

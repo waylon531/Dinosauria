@@ -1,0 +1,45 @@
+import lightingProgram from "lighting.material"
+
+fragment_program test_shaderFS glsl : lightingProgram
+{
+	source test_shader.frag
+}
+vertex_program test_shaderVS glsl
+{
+	source test_shader.vert
+}
+
+material Material0 
+{
+    receive_shadows on
+
+    technique
+    {
+	scheme low
+	pass
+	{
+		ambient 0.1 0.1 0.1 1
+		diffuse 0.8 0.8 0.8 1
+		specular 0.8 0.8 0.8 3
+	}
+    }
+    
+    technique
+    {
+	//scheme medium
+	
+        pass
+        {
+		ambient 0.1 0.1 0.1
+		diffuse 0.5 0.5 0.5 1
+		specular 0.5 0.5 0.5 5
+		
+		vertex_program_ref test_shaderVS
+		{
+		}
+		fragment_program_ref test_shaderFS
+		{
+		}
+        }
+    }
+}

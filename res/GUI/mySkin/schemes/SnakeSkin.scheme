@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<GUIScheme Name="SnakeSkin">
+  <Imageset Name="SnakeSkin" Filename="SnakeSkin.imageset"/>
+  
+  <LookNFeel Filename="SnakeSkin.looknfeel"/>
+  <WindowRendererSet Filename="CEGUIFalagardWRBase"/>
+
+  <FalagardMapping WindowType="SnakeSkin/Button" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="SnakeSkin/Button"/>
+</GUIScheme>

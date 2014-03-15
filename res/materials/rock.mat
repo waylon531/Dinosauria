@@ -1,6 +1,0 @@
-vert res/shaders/rock/rock.vert
-frag res/shaders/rock/rock.frag
-link
-tex res/textures/rock_face/specular.png tex_specular
-tex res/textures/rock_face/normal.png tex_normal
-tex res/textures/rock_face/height.png tex_height

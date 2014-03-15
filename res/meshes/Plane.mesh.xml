@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mesh>
+    <sharedgeometry vertexcount="4">
+        <vertexbuffer texture_coords="0" colours_diffuse="False" normals="true" positions="true">
+            <vertex>
+                <position z="640.000000" y="0.000000" x="-640.000000"/>
+                <normal z="-0.000000" y="1.000000" x="0.000000"/>
+            </vertex>
+            <vertex>
+                <position z="640.000000" y="0.000000" x="640.000000"/>
+                <normal z="-0.000000" y="1.000000" x="0.000000"/>
+            </vertex>
+            <vertex>
+                <position z="-640.000000" y="0.000000" x="640.000000"/>
+                <normal z="-0.000000" y="1.000000" x="0.000000"/>
+            </vertex>
+            <vertex>
+                <position z="-640.000000" y="0.000000" x="-640.000000"/>
+                <normal z="-0.000000" y="1.000000" x="0.000000"/>
+            </vertex>
+        </vertexbuffer>
+    </sharedgeometry>
+    <submeshes>
+        <submesh operationtype="triangle_list" use32bitindexes="False" material="ground" usesharedvertices="true">
+            <faces count="2">
+                <face v1="0" v2="1" v3="2"/>
+                <face v1="0" v2="2" v3="3"/>
+            </faces>
+        </submesh>
+    </submeshes>
+    <submeshnames>
+        <submesh name="ground" index="0">
+        </submesh>
+    </submeshnames>
+</mesh>

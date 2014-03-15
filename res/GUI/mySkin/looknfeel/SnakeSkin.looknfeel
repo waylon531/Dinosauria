@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<Falagard>
+  <WidgetLook name="SnakeSkin/Button">
+    <ImagerySection name="normal_imagery">
+      <ImageryComponent>
+	<Area>
+	  <Dim type="LeftEdge"> <AbsoluteDim value="0"/> </Dim> 
+	  <Dim type="TopEdge"> <AbsoluteDim value="0"/> </Dim>
+	  <Dim type="Width"> <ImageDim imageset="SnakeSkin" image="ButtonLeftNormal" dimension="Width"/> </Dim>
+	  <Dim type="Height"> <UnifiedDim scale="1.0" type="Height"/> </Dim>
+	</Area>
+	<Image imageset="SnakeSkin" image="ButtonLeftNormal"/>
+	<VertFormat type="Stretched"/>
+	<HorzFormat type="LeftAligned"/>
+      </ImageryComponent>
+
+      <ImageryComponent>
+	<Area>
+	  <Dim type="LeftEdge"> <AbsoluteDim value="0"/> </Dim>
+	  <Dim type="TopEdge"> <AbsoluteDim value="0"/> </Dim>
+	  <Dim type="Width"> <UnifiedDim scale="1" type="Width"/> </Dim>
+	  <Dim type="Height"> <UnifiedDim scale="1" type="Width"/> </Dim>
+	</Area>
+	<Image imageset="SnakeSkin" image="ButtonRightNormal"/>
+	<VertFormat type="Stretched"/>
+	<HorzFormat type="RightAligned"/>
+      </ImageryComponent>
+      
+      <ImageryComponent>
+	<Area>
+	  <Dim type="LeftEdge"> <ImageDim imageset="SnakeSkin" image="ButtonMiddleNormal" dimension="Width"/> </Dim>
+	  <Dim type="TopEdge"> <AbsoluteDim value="0"/> </Dim>
+	  <Dim type="RightEdge">
+	    <ImageDim imageset="SnakeSkin" image="ButtonRightNormal" dimension="Width">
+	      <DimOperator op="Subtract">
+		<UnifiedDim scale="1" type="Width"/>
+	      </DimOperator>
+	    </ImageDim>
+	  </Dim>
+	  <Dim type="Height"> <UnifiedDim scale="1" type="Height"/> </Dim>
+	</Area>
+	<Image imageset="SnakeSkin" image="ButtonMiddleNormal"/>
+	<VertFormat type="Stretched"/>
+	<!--<HorzFormat type="Stretched"/>-->
+      </ImageryComponent>
+    </ImagerySection>
+
+    <!--<ImagerySection name="hover_imagery">
+    </ImagerySection>
+
+    <ImagerySection name="pushed_imagery">
+    </ImagerySection>-->
+    
+    <StateImagery name="Normal">
+      <Layer> <Section section="normal_imagery"/> </Layer>
+    </StateImagery>
+
+    <!--<StateImagery name="Hover">
+    </StateImagery>
+
+    <StateImagery name="Pushed">
+    </StateImagery>-->
+
+    <StateImagery name="Disabled"><Layer>
+          <Section section="normal_imagery">
+	    <Colours
+		topLeft="FF7F7F7F"
+		topRight="FF7F7F7F"
+		bottomLeft="FF7F7F7F"
+		bottomRight="FF7F7F7F"
+		/>
+	  </Section>
+	</Layer>
+    </StateImagery>
+  </WidgetLook>
+  
+</Falagard>

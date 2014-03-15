@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<GUILayout>
+  <Window Type="DefaultWindow" Name="MainMenu/Background">
+    
+    <Window Type="TaharezLook/StaticText" Name="MainMenu/Title">
+      <Property Name="UnifiedAreaRect" Value="{{0.35,0},{0.4,0},{0.65,0},{0.45,0}}"/>
+      <Property Name="Text" Value="Dinosauria"/>
+    </Window>
+    
+    <Window Type="TaharezLook/Button" Name="MainMenu/Options">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.6,0},{0.8,0},{0.6,37}}"/>
+      <Property Name="Text" Value="Options"/>
+    </Window>
+    
+    <Window Type="TaharezLook/Button" Name="MainMenu/Quit">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.7,0},{0.8,0},{0.7,37}}"/>
+      <Property Name="Text" Value="Quit"/>
+    </Window>
+    
+    <Window Type="TaharezLook/Button" Name="MainMenu/StartGame">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.5,0},{0.8,0},{0.5,37}}"/>
+      <Property Name="Text" Value="Start Game"/>
+    </Window>
+  </Window>
+</GUILayout>

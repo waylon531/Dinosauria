@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<GUILayout>
+  <Window Type="DefaultWindow" Name="TestLayout">
+    <Window Type="TaharezLook/FrameWindow" Name="Main">
+      <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{.5,0},{.5,0}}"/>
+      <Property Name="Text" Value="Test Layout"/>
+      <Property Name="CloseButtonEnabled" Value="true"/>
+    </Window>
+  </Window>
+</GUILayout>

@@ -1,4 +1,0 @@
-vert res/shaders/blockasaurus/block.vert
-frag res/shaders/blockasaurus/block.frag
-link
-tex res/textures/skin.png tex_skin

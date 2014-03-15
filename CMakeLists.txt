@@ -1,109 +1,78 @@
+#####setup#####
+project(dinosauria)
+
 cmake_minimum_required(VERSION 2.8)
 
-project(Dinosauria)
-set(Dinosauria_VERSION_MAJOR 0)
-set(Dinosauria_VERSION_MINOR 1.1)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} cmake)
 
-set(CMAKE_USE_RELATIVE_PATHS true)
+set(CMAKE_CXX_COMPILER clang++)
 
-file(GLOB_RECURSE SRC_FILES src/*.cpp)
+#####configuration#####
+set(DEBUG true)
+set(RELEASE false)
 
-add_executable(bin/dinosauria ${SRC_FILES})
-add_executable(bin/converter converters/converter.cpp)
-add_executable(bin/bconverter converters/bconverter.cpp)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wno-deprecated")
 
-include_directories(src external/include)
+if(DEBUG)
+	set(GLOBAL_FLAGS "${GLOBAL_FLAGS} -O0 -g")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+endif(DEBUG)
 
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Lexternal/lib")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -Wl,-rpath -Wl,./lib")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow -g")
+if(RELEASE)
+	set(GLOBAL_FLAGS "${GLOBAL_FLAGS} -O4")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRELEASE")
+endif(RELEASE)
 
-if(APPLE)
-	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-else()
-	set(CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GLOBAL_FLAGS}")
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${GLOBAL_FLAGS}")
 
-if(UNIX)
-	target_link_libraries(bin/dinosauria rt)
-	target_link_libraries(bin/dinosauria X11)
-	target_link_libraries(bin/dinosauria Xrandr)
-	target_link_libraries(bin/dinosauria Xxf86vm)
-	target_link_libraries(bin/dinosauria Xi)
-	target_link_libraries(bin/dinosauria pthread)
-endif()
+#####targets#####
+include_directories(src)
 
-#find OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIRS})
-target_link_libraries(bin/dinosauria ${OPENGL_LIBRARIES})
+set(LIB_SRC_FILES ${LIB_SRC_FILES} external/pugixml-1.4/src/pugixml.cpp src/util.cpp src/engine/state_manager.cpp src/engine/settings.cpp)
 
-#find GLEW
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-target_link_libraries(bin/dinosauria ${GLEW_LIBRARIES})
+add_subdirectory(external)
 
-#find Freetype
-find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-target_link_libraries(bin/dinosauria ${FREETYPE_LIBRARIES})
+add_library(libdinosauria STATIC ${LIB_SRC_FILES})
 
-#find PNG
-find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIRS})
-target_link_libraries(bin/dinosauria ${PNG_LIBRARIES})
+set(GRAPHICS_SRC_FILES src/graphics/context.cpp src/game/state_mmenu.cpp src/game/state_options.cpp src/game/state_test.cpp)
+add_executable(dinosauria src/main.cpp ${GRAPHICS_SRC_FILES})
+add_executable(runTests src/tests.cpp)
 
-#find Bullet
-find_package(Bullet REQUIRED)
-include_directories(${BULLET_INCLUDE_DIRS})
-target_link_libraries(bin/dinosauria ${BULLET_LIBRARIES})
+#target_link_libraries(otst pugixml)
+target_link_libraries(dinosauria libdinosauria)
 
-target_link_libraries(bin/dinosauria glfw3)
-target_link_libraries(bin/dinosauria noise)
-target_link_libraries(bin/dinosauria freetype-gl)
-target_link_libraries(bin/dinosauria pugixml)
-target_link_libraries(bin/dinosauria ngpcore)
+target_link_libraries(runTests libdinosauria)
+#target_link_libraries(runTests pugixml)
 
-target_link_libraries(bin/converter assimp)
-target_link_libraries(bin/bconverter assimp)
-target_link_libraries(bin/dinosauria assimp)
+#####libraries#####
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
+##Boost##
+set(BOOST_COMPONENTS thread system unit_test_framework)
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+target_link_libraries(runTests ${Boost_LIBRARIES})
+target_link_libraries(dinosauria ${Boost_LIBRARIES})
+target_link_libraries(libdinosauria ${Boost_LIBRARIES})
+include_directories(${Boost_INCLUDE_DIRS})
 
-#CPack installation
+##OGRE##
+find_package(OGRE REQUIRED)
+target_link_libraries(dinosauria ${OGRE_LIBRARIES})
+include_directories(${OGRE_INCLUDE_DIRS})
 
-install(TARGETS bin/dinosauria
-RUNTIME DESTINATION bin
-LIBRARY DESTINATION bin
-)
+##OIS##
+find_package(OIS REQUIRED)
+target_link_libraries(dinosauria ${OIS_LIBRARIES})
+include_directories(${OIS_INCLUDE_DIRS})
 
-install(DIRECTORY
-lib
-DESTINATION ./)
+##CEGUI##
+find_package(CEGUI COMPONENTS Ogre REQUIRED)
+target_link_libraries(dinosauria ${CEGUI_LIBRARY})
+include_directories(${CEGUI_INCLUDE_DIR})
 
-install(DIRECTORY
-res
-DESTINATION ./
-FILES_MATCHING
-PATTERN "*.xml"
-PATTERN "*.mat"
-PATTERN "*.frag"
-PATTERN "*.vert"
-PATTERN "*.geom"
-PATTERN "*.ctrl"
-PATTERN "*.glh"
-PATTERN "*.eval"
-PATTERN "*.ttf"
-PATTERN "*.png"
-PATTERN "*.OBJ"
-PATTERN "*.obj"
-PATTERN "*.mesh"
-)
+#####run unit tests#####
+######TODO######
 
-set(CPACK_GENERATOR "ZIP")
-set(CPACK_PACKAGE_NAME "Dinosauria")
-set(CPACK_PACKAGE_VERSION "${Dinosauria_VERSION_MAJOR}.${Dinosauria_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_MAJOR "${Dinosauria_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR "${Dinosauria_VERSION_MINOR})
-include(CPack)
+##debug info##
+#message("cxx_flags = ${CMAKE_CXX_FLAGS}")
+#message("link_flags = ${CMAKE_CXX_LINK_FLAGS}")

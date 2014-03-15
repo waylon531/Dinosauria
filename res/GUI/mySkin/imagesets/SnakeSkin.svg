@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1280"
+   height="1024"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="SnakeSkin.svg"
+   inkscape:export-filename="/root/projects/otst/res/GUI/mySkin/imagesets/SnakeSkin.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect2987"
+       is_visible="true" />
+    <filter
+       id="filter4273"
+       inkscape:label="Jigsaw piece"
+       inkscape:menu="Bevels"
+       inkscape:menu-tooltip="Low, sharp bevel"
+       color-interpolation-filters="sRGB">
+      <feSpecularLighting
+         id="feSpecularLighting4275"
+         in="SourceAlpha"
+         surfaceScale="1"
+         specularConstant="2"
+         specularExponent="18.5"
+         result="result1">
+        <feDistantLight
+           id="feDistantLight4277"
+           elevation="30"
+           azimuth="225" />
+      </feSpecularLighting>
+      <feComposite
+         id="feComposite4279"
+         in2="SourceGraphic"
+         result="result0"
+         operator="atop" />
+      <feMorphology
+         id="feMorphology4281"
+         radius="2"
+         result="result1"
+         in="SourceAlpha"
+         operator="dilate" />
+      <feComposite
+         id="feComposite4283"
+         in2="result1"
+         in="result0" />
+    </filter>
+    <filter
+       id="filter4350"
+       inkscape:label="Dark glass"
+       inkscape:menu="Bevels"
+       inkscape:menu-tooltip="Illuminated glass effect with light coming from beneath"
+       height="1.5"
+       width="1.5"
+       y="-0.25"
+       x="-0.25"
+       color-interpolation-filters="sRGB">
+      <feBlend
+         id="feBlend4352"
+         in2="result91"
+         result="result1"
+         mode="screen" />
+      <feGaussianBlur
+         id="feGaussianBlur4354"
+         stdDeviation="2"
+         result="result6" />
+      <feComposite
+         id="feComposite4356"
+         in2="result1"
+         operator="xor"
+         in="result6"
+         result="result7" />
+      <feComposite
+         id="feComposite4358"
+         in2="result7"
+         result="result4"
+         in="result7"
+         operator="xor" />
+      <feGaussianBlur
+         id="feGaussianBlur4360"
+         result="result3"
+         stdDeviation="3"
+         in="result4" />
+      <feSpecularLighting
+         id="feSpecularLighting4362"
+         result="result5"
+         specularExponent="55"
+         specularConstant="1.5"
+         surfaceScale="6"
+         in="result3">
+        <fePointLight
+           id="fePointLight4364"
+           z="20000"
+           y="-8000"
+           x="-5000" />
+      </feSpecularLighting>
+      <feComposite
+         id="feComposite4366"
+         in2="SourceGraphic"
+         in="result3"
+         k3="1"
+         k2="1.5"
+         operator="arithmetic"
+         result="result92" />
+      <feComposite
+         id="feComposite4368"
+         in2="result92"
+         in="result5"
+         operator="atop"
+         result="result93" />
+      <feBlend
+         id="feBlend4370"
+         in2="result93"
+         mode="multiply" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="222.16967"
+     inkscape:cy="752.95337"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="915"
+     inkscape:window-x="0"
+     inkscape:window-y="31"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-28.362183)">
+    <rect
+       style="fill:#93ffc8;fill-opacity:1;stroke-width:2;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4273)"
+       id="rect2989"
+       width="95"
+       height="37"
+       x="2.0203052"
+       y="29.077654"
+       ry="17.979694"
+       rx="16.162437" />
+    <path
+       sodipodi:type="star"
+       style="fill:#934e04;fill-opacity:1;stroke-width:2;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4350)"
+       id="path4306"
+       sodipodi:sides="3"
+       sodipodi:cx="95.964493"
+       sodipodi:cy="1.7256241"
+       sodipodi:r1="19.613615"
+       sodipodi:r2="8.2860775"
+       sodipodi:arg1="-0.96850898"
+       sodipodi:arg2="0.61955452"
+       inkscape:flatsided="true"
+       inkscape:rounded="8.6736174e-17"
+       inkscape:randomized="0.007"
+       d="M 107.17331,-14.443053 104.44004,19.462019 76.493884,0.16199781 z"
+       transform="matrix(1,0,0,0.76165158,30.597489,45.122756)"
+       inkscape:transform-center-x="4.2206226"
+       inkscape:transform-center-y="0.58714765" />
+  </g>
+</svg>

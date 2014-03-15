@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Options/Background">
+
+    <Window Type="TaharezLook/StaticText" Name="Options/Graphics">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.1,0},{0.3,0},{0.15,0}}"/>
+      <Property Name="Text" Value="Graphics"/>
+    </Window>
+
+    <Window Type="TaharezLook/RadioButton" Name="Options/GraphicsLow">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,50},{0.2,0},{0.1,90},{0.2,40}}"/>
+      <Property Name="GroupID" Value="0"/>
+      <Property Name="ID" Value="0"/>
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Options/GraphicsLowText">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,100},{0.2,0},{0.1,210},{0.2,40}}"/>
+      <Property Name="Text" Value="Low"/>
+    </Window>
+    
+    <Window Type="TaharezLook/RadioButton" Name="Options/GraphicsMedium">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,50},{0.25,0},{0.1,90},{0.25,40}}"/>
+      <Property Name="GroupID" Value="0"/>
+      <Property Name="ID" Value="1"/>
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Options/GraphicsMediumText">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,100},{0.25,0},{0.1,210},{0.25,40}}"/>
+      <Property Name="Text" Value="Medium"/>
+    </Window>
+
+    <Window Type="TaharezLook/RadioButton" Name="Options/GraphicsHigh">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,50},{0.3,0},{0.1,90},{0.3,40}}"/>
+      <Property Name="GroupID" Value="0"/>
+      <Property Name="ID" Value="2"/>
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Options/GraphicsHighText">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,100},{0.3,0},{0.1,210},{0.3,40}}"/>
+      <Property Name="Text" Value="High"/>
+    </Window>    
+
+    <Window Type="TaharezLook/RadioButton" Name="Options/GraphicsExtreme">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,50},{0.35,0},{0.1,90},{0.35,40}}"/>
+      <Property Name="GroupID" Value="0"/>
+      <Property Name="ID" Value="3"/>
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Options/GraphicsExtremeText">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,100},{0.35,0},{0.1,210},{0.35,40}}"/>
+      <Property Name="Text" Value="Extreme"/>
+    </Window>    
+    
+    
+    <Window Type="TaharezLook/Button" Name="Options/Close">
+      <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.8,0},{0.4,0},{0.8,37}}"/>
+      <Property Name="Text" Value="Close"/>
+    </Window>
+  </Window>
+</GUILayout>
