@@ -28,10 +28,11 @@ abstract technique groundTechnique
 {
 	pass groundPass
 	{
-		ambient 0.1 0.1 0.1 1
-		diffuse 0.9 0.7 0.9 1
-		specular 2.0 2.0 2.0 5
-		
+		ambient 0 0 0 1
+		diffuse 0 0 0 1
+		specular 0 0 0 1
+		lighting on
+
 		vertex_program_ref groundVS
 		{
 		}
@@ -54,7 +55,7 @@ abstract technique groundTechnique
 
 material ground
 {
-	receive_shadows on
+	receive_shadows off
 
 	technique
 	{

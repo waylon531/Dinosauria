@@ -1,0 +1,6 @@
+[submodule "external/lua"]
+	path = external/lua
+	url = https://github.com/LuaDist/lua.git
+[submodule "external/luabind"]
+	path = external/luabind
+	url = https://github.com/Benjamin-L/luabind.git

@@ -16,6 +16,8 @@
 #include <CEGUIWindow.h>
 #include <CEGUIImageset.h>
 //#include <CEGUIWidgetModule.h>
+//custom external includes
+#include "luabind/luabind.hpp"
 //custom includes
 #include "util.hpp"
 #include "engine/state_manager.hpp"
@@ -24,13 +26,19 @@ void graphics::OgreEngine::setupGUIMgr()
 {
   window->removeAllViewports();
   window->addViewport(cam_gui);
+#ifdef DEBUG
+  std::cout << "Setting GUI Scene Manager" << std::endl;
+#endif
 }
 
 void graphics::OgreEngine::startup()
 {
   isInitialized = true;
   root = new Ogre::Root("ogre_cfg/plugins.cfg","ogre_cfg/ogre.cfg",LOG_FILENAME);
-
+#ifndef DEBUG
+  Ogre::LogManager::getSingleton().setLogDetail(Ogre::LL_LOW);
+#endif
+  
   if (root->showConfigDialog())
     {
       window = root->initialise(true, "OTST");
@@ -124,15 +132,24 @@ void graphics::OgreEngine::startRenderLoop()
 
 bool graphics::OgreEngine::frameRenderingQueued(const Ogre::FrameEvent& e)
 {
-  keyboard->capture();
-  mouse->capture();
-  CEGUI::System::getSingleton().injectTimePulse(e.timeSinceLastFrame);
-  engine::StateManager::getSingleton().onTick(e.timeSinceLastFrame);
-  if(window->isClosed() || engine::StateManager::getSingleton().isRunning==false) return false;
-  //cap framerate
-  if(e.timeSinceLastFrame < 15.0)
+  try
     {
-      usleep(15000 - int(1000 * e.timeSinceLastFrame));
+      keyboard->capture();
+      mouse->capture();
+      CEGUI::System::getSingleton().injectTimePulse(e.timeSinceLastFrame);
+      engine::StateManager::getSingleton().onTick(e.timeSinceLastFrame);
+      if(window->isClosed() || engine::StateManager::getSingleton().isRunning==false) return false;
+      //cap framerate
+      if(e.timeSinceLastFrame < 15.0)
+	{
+	  usleep(15000 - int(1000 * e.timeSinceLastFrame));
+	}
+    }
+  catch(const luabind::error& e)
+    {
+      luabind::object error_msg(luabind::from_stack(e.state(), -1));
+      std::cout << "Lua runtime error: " << error_msg << std::endl;
+      throw std::runtime_error("");
     }
   
   return true;

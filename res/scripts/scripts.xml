@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<Scripts>
+  <Script Name="setup.lua"/>
+  <Directory Name="main_menu"/>
+  <Directory Name="options"/>
+  <Directory Name="test"/>
+</Scripts>

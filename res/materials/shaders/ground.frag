@@ -43,12 +43,12 @@ void main()
   #endif
   //gl_FragColor = vec4(mod(texCoord.x,1.0), mod(texCoord.y,1.0), 0.0, 1.0);
   //return;
-  #ifdef USE_NORMALMAPb
-  vec3 normal = texture2D(normalMap, texCoord).xyz;
+  #ifdef USE_NORMALMAP
+  vec3 normal = texture2D(normalMap, texCoord).xzy;
   #else
   vec3 normal = vec3(0.0,1.0,0.0);
   #endif
   vec4 diffuse = texture2D(diffuseMap, texCoord);
   vec4 lighting = computeLighting(normal, vPosition, diffuse, diffuse, diffuse);
-  gl_FragColor = vec4((lighting.xyz), 1.0);
+  gl_FragColor = vec4(lighting.xyz, 1.0);
 }

@@ -14,6 +14,9 @@ namespace engine
   {
   public:
 
+    /** Add this state to the state manager */
+    void add();
+    
     /** Get the string ID of this state
      * @return string name of this state */
     virtual std::string getName() const =0;

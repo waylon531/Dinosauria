@@ -33,6 +33,7 @@ material Material0
 		ambient 0.1 0.1 0.1
 		diffuse 0.5 0.5 0.5 1
 		specular 0.5 0.5 0.5 5
+		lighting off
 		
 		vertex_program_ref test_shaderVS
 		{
