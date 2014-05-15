@@ -1,7 +1,8 @@
 #Dinosauria
 
 ##Introduction
-This is a game from the perspective of a dinosaur with the goal of being very realistic (and scientifically accurate). It is currently in a stage where pretty much all hat you can actually do is walk around and look at the graphics. Most of the work so far has been on the graphics, but I plan to implement better gameplay soon.
+This is a game from the perspective of a dinosaur with the goal of being very realistic (and scientifically accurate). It is currently in a stage where pretty much all that you can actually do is walk around and look 
+at the graphics. Most of the work so far has been on the graphics, but I plan to implement better gameplay soon.
 ###This branch
 This branch is my attempt to start all over again (except for art assets) because the master branch has become too unrepairably messy to continue working on. Specifically, I need to implement a scene graph and a culling algorithm but forgot to add bounding box support to the ```RenderableObjectExt``` class.
 
@@ -21,7 +22,7 @@ The following libraries are packaged directly:
  - Pugixml (XML file parsing)
 
 ##Compiling
-In the "dinosauira" root direcotry, type:
+In the "dinosauria" root directory, type:
 ```
 mkdir build
 cd build
